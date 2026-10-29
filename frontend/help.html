@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Help & Feedback — InterviewAI</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+  <div class="app-layout">
+    <aside id="sidebar"></aside>
+
+    <div class="app-main">
+      <header id="topbar"></header>
+
+      <main class="page-body">
+        
+        <div style="margin-bottom: 2rem;">
+          <div style="display:inline-flex; align-items:center; gap:0.4rem; background:var(--color-primary-light); color:var(--color-primary); padding:0.25rem 0.75rem; border-radius:9999px; font-size:0.75rem; font-weight:700; margin-bottom:0.5rem;">
+            <i data-lucide="life-buoy" style="width:14px;height:14px;"></i> STUDENT SUPPORT
+          </div>
+          <h1 style="font-size: 1.85rem; margin-bottom: 0.35rem;">Help, Placement FAQs & Feedback</h1>
+          <p style="color: var(--color-text-muted);">
+            Frequently asked questions regarding campus hiring assessments, ATS resumes, and platform usage guidelines.
+          </p>
+        </div>
+
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:1.75rem; margin-bottom:2.5rem;">
+          
+          <!-- Column 1: Placement FAQs -->
+          <div>
+            <h3 style="font-size:1.25rem; margin-bottom:1rem;">Placement Preparation FAQs</h3>
+            
+            <div style="display:flex; flex-direction:column; gap:0.75rem;">
+              <div class="card" style="padding:1.25rem;">
+                <h4 style="font-size:1rem; margin-bottom:0.35rem; color:var(--color-text-main);">Why are answers locked immediately upon submission?</h4>
+                <p style="font-size:0.875rem; color:var(--color-text-muted); line-height:1.5;">
+                  Real campus recruitment tests (TCS iON, AMCAT, CoCubes, eLitmus) enforce immutable answer submissions. InterviewAI preserves the submitted state so students analyze their actual thought process rather than re-guessing.
+                </p>
+              </div>
+
+              <div class="card" style="padding:1.25rem;">
+                <h4 style="font-size:1rem; margin-bottom:0.35rem; color:var(--color-text-main);">How do company recruitment cutoffs work?</h4>
+                <p style="font-size:0.875rem; color:var(--color-text-muted); line-height:1.5;">
+                  Most mass recruiters enforce a 60-65% sectional cutoff across Quantitative, Logical, and Coding sections. Tier-1 product firms (Google, Amazon) require 80-85%+ with zero failing test cases.
+                </p>
+              </div>
+
+              <div class="card" style="padding:1.25rem;">
+                <h4 style="font-size:1rem; margin-bottom:0.35rem; color:var(--color-text-main);">How does the ATS Resume Builder score my resume?</h4>
+                <p style="font-size:0.875rem; color:var(--color-text-muted); line-height:1.5;">
+                  The ATS engine scans your listed projects, technical skill keywords (OOP, SQL, REST APIs), and academic CGPA against typical employer screening parser criteria.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Column 2: Student Feedback Form -->
+          <div>
+            <h3 style="font-size:1.25rem; margin-bottom:1rem;">Submit Feedback / Report Question</h3>
+
+            <div class="card" style="padding:1.75rem;">
+              <form id="feedbackForm">
+                <div class="form-group">
+                  <label class="form-label" for="feedbackCategory">Feedback Category</label>
+                  <select id="feedbackCategory" class="form-select" required>
+                    <option value="question_issue">Report an issue with a Question/Solution</option>
+                    <option value="feature_request">Suggest a new placement preparation feature</option>
+                    <option value="company_request">Request additional company drive specifications</option>
+                    <option value="general">General Student Experience</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="feedbackSubject">Subject</label>
+                  <input type="text" id="feedbackSubject" class="form-input" placeholder="Brief summary of feedback..." required>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="feedbackMessage">Detailed Message</label>
+                  <textarea id="feedbackMessage" class="form-textarea" style="height:120px;" placeholder="Provide specific details or suggestions to help us improve..." required></textarea>
+                </div>
+
+                <button type="submit" id="submitFeedbackBtn" class="btn btn-primary btn-full">
+                  <i data-lucide="send" style="width:16px;height:16px;"></i> Send Feedback
+                </button>
+              </form>
+
+              <div id="feedbackSuccessBox" style="display:none; margin-top:1.25rem; padding:1rem; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:var(--radius-md); color:#15803d; font-size:0.875rem;">
+                ✓ <strong>Thank you!</strong> Your feedback has been recorded. Our curriculum team reviews suggestions continuously.
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const user = await auth.requireAuth();
+      if (!user) return;
+      if (window.lucide) lucide.createIcons();
+
+      const form = document.getElementById('feedbackForm');
+      if (form) {
+        form.addEventListener('submit', (e) => {
+          e.preventDefault();
+          document.getElementById('feedbackSuccessBox').style.display = 'block';
+          document.getElementById('submitFeedbackBtn').disabled = true;
+          document.getElementById('submitFeedbackBtn').textContent = 'Feedback Sent';
+          showToast('Thank you for your feedback!', 'success');
+        });
+      }
+    });
+  </script>
+</body>
+</html>

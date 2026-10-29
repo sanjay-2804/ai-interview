@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Career Setup Wizard — InterviewAI</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body style="min-height:100vh; background-color: var(--color-bg-page); padding: 2.5rem 1rem;">
+
+  <div style="max-width: 760px; margin: 0 auto;">
+    <!-- Wizard Header -->
+    <div style="text-align:center; margin-bottom: 2rem;">
+      <a href="dashboard.html" class="brand-logo" style="justify-content:center; margin-bottom: 0.5rem;">
+        <div class="brand-icon">AI</div>
+        <span>InterviewAI</span>
+      </a>
+      <h1 style="font-size: 1.85rem; margin-bottom: 0.5rem;">Personalize Your Placement Pathway</h1>
+      <p style="color: var(--color-text-muted);">Choose your target career goal and study preferences to customize your roadmaps and assessments.</p>
+    </div>
+
+    <!-- Wizard Form Card -->
+    <div class="card" style="padding: 2.25rem; box-shadow: var(--shadow-md);">
+      <form id="careerSetupForm">
+        <!-- 1. Target Role -->
+        <div class="form-group">
+          <label class="form-label" for="targetCareer">
+            <i data-lucide="crosshair" style="width:16px;height:16px;display:inline-block;vertical-align:middle;color:var(--color-primary);"></i>
+            Primary Target Career
+          </label>
+          <select id="targetCareer" class="form-select" required>
+            <option value="">-- Select Your Placement Goal --</option>
+            <option value="Software Engineer">Software Engineer / Software Developer</option>
+            <option value="Java Developer">Java Developer</option>
+            <option value="Python Developer">Python Developer</option>
+            <option value="Frontend Developer">Frontend Developer</option>
+            <option value="Backend Developer">Backend Developer</option>
+            <option value="Full-Stack Developer" selected>Full-Stack Developer</option>
+            <option value="Data Analyst">Data Analyst</option>
+            <option value="Data Scientist">Data Scientist</option>
+            <option value="AI / Machine Learning Engineer">AI / Machine Learning Engineer</option>
+            <option value="Cybersecurity Engineer">Cybersecurity Engineer</option>
+            <option value="Cloud / DevOps Engineer">Cloud / DevOps Engineer</option>
+            <option value="Mobile Developer">Mobile Developer (Android / iOS / Flutter)</option>
+            <option value="QA / Testing Engineer">QA / Testing Engineer</option>
+            <option value="Database Engineer">Database Engineer / DBA</option>
+            <option value="Other">Other / General Technology Placement</option>
+          </select>
+          <div class="form-hint">Your roadmap milestones, coding recommendations, and mock interview questions will align with this role.</div>
+        </div>
+
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem;">
+          <!-- 2. Skill Level -->
+          <div class="form-group">
+            <label class="form-label" for="skillLevel">Current Technical Skill Level</label>
+            <select id="skillLevel" class="form-select" required>
+              <option value="Beginner">Beginner (Foundations & Syntax)</option>
+              <option value="Intermediate" selected>Intermediate (Basic DSA & Projects)</option>
+              <option value="Advanced">Advanced (Placement & Complex Algorithms)</option>
+            </select>
+          </div>
+
+          <!-- 3. Preferred Language -->
+          <div class="form-group">
+            <label class="form-label" for="preferredLang">Primary Coding Language</label>
+            <select id="preferredLang" class="form-select" required>
+              <option value="Python" selected>Python</option>
+              <option value="Java">Java</option>
+              <option value="C++">C++</option>
+              <option value="JavaScript">JavaScript</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem;">
+          <!-- 4. Daily Study Time -->
+          <div class="form-group">
+            <label class="form-label" for="dailyTime">Daily Study Time</label>
+            <select id="dailyTime" class="form-select" required>
+              <option value="30 minutes">30 minutes / day</option>
+              <option value="1 hour" selected>1 hour / day</option>
+              <option value="2 hours">2 hours / day</option>
+              <option value="3+ hours">3+ hours / day (Intensive)</option>
+            </select>
+          </div>
+
+          <!-- 5. Placement Timeline -->
+          <div class="form-group">
+            <label class="form-label" for="timeline">Placement Target Timeline</label>
+            <select id="timeline" class="form-select" required>
+              <option value="Within 1 month">Within 1 month (Immediate Drives)</option>
+              <option value="3 months" selected>3 months (Upcoming Semester)</option>
+              <option value="6 months">6 months (Next Placement Season)</option>
+              <option value="1 year">1 year (Long-term preparation)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- 6. Learning Priorities -->
+        <div class="form-group">
+          <label class="form-label">Core Preparation Priorities (Select all that apply)</label>
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem; margin-top: 0.5rem;">
+            <label class="form-check card" style="padding: 0.75rem;">
+              <input type="checkbox" name="priority" value="Aptitude & Tests" checked>
+              <span>Aptitude & Speed Tests</span>
+            </label>
+            <label class="form-check card" style="padding: 0.75rem;">
+              <input type="checkbox" name="priority" value="DSA & Problem Solving" checked>
+              <span>DSA & Coding Challenges</span>
+            </label>
+            <label class="form-check card" style="padding: 0.75rem;">
+              <input type="checkbox" name="priority" value="Communication & HR" checked>
+              <span>Spoken English & HR Rounds</span>
+            </label>
+            <label class="form-check card" style="padding: 0.75rem;">
+              <input type="checkbox" name="priority" value="Core CS Subjects" checked>
+              <span>DBMS, OS & Networks</span>
+            </label>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap: 1rem; margin-top: 2rem; border-top: 1px solid var(--color-border); padding-top: 1.5rem;">
+          <a href="dashboard.html" id="skipCareerBtn" class="btn btn-secondary">Skip for Now</a>
+          <button type="submit" id="saveCareerBtn" class="btn btn-primary btn-lg">
+            <i data-lucide="sparkles" style="width:18px;height:18px;"></i> Save & Launch Dashboard
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/career-setup.js"></script>
+</body>
+</html>

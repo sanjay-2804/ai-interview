@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Company Interview Questions Library — InterviewAI</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    .filter-chip {
+      padding: 0.35rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid var(--color-border);
+      background: var(--color-bg-page);
+      color: var(--color-text-muted);
+      transition: all 0.15s ease;
+    }
+    .filter-chip.active {
+      background: var(--color-primary);
+      color: #ffffff;
+      border-color: var(--color-primary);
+    }
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .modal-content {
+      background: #ffffff;
+      border-radius: var(--radius-lg);
+      max-width: 650px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
+      border: 1px solid var(--color-border);
+      padding: 1.75rem;
+    }
+    .solution-drawer {
+      display: none;
+      margin-top: 0.75rem;
+      padding: 1rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.875rem;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-layout">
+    <aside id="sidebar"></aside>
+
+    <div class="app-main">
+      <header id="topbar"></header>
+
+      <main class="page-body">
+        
+        <!-- Header -->
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 2rem; flex-wrap:wrap; gap:1rem;">
+          <div>
+            <div style="display:inline-flex; align-items:center; gap:0.4rem; background:var(--color-primary-light); color:var(--color-primary); padding:0.25rem 0.75rem; border-radius:9999px; font-size:0.75rem; font-weight:700; margin-bottom:0.5rem;">
+              <i data-lucide="file-question" style="width:14px;height:14px;"></i> COMPANY QUESTION REPOSITORY
+            </div>
+            <h1 style="font-size: 1.85rem; margin-bottom: 0.35rem;">Company-Specific Question Library</h1>
+            <p style="color: var(--color-text-muted);">
+              Explore authentic interview questions, ask AI for deep recruiter rubrics, or contribute questions asked in recent campus drives across 22 premier tech employers.
+            </p>
+          </div>
+
+          <!-- Quick Action Buttons -->
+          <div style="display:flex; gap:0.6rem; flex-wrap:wrap;">
+            <button id="openAskAiBtn" class="btn btn-outline">
+              <i data-lucide="sparkles" style="width:16px;height:16px;color:var(--color-primary);"></i> Ask / Analyze Question with AI
+            </button>
+            <button id="openAddQBtn" class="btn btn-secondary">
+              <i data-lucide="plus-circle" style="width:16px;height:16px;"></i> Add Interview Question
+            </button>
+            <a href="company-interviews.html" class="btn btn-primary">
+              <i data-lucide="play" style="width:16px;height:16px;"></i> Launch Full Drive Simulator
+            </a>
+          </div>
+        </div>
+
+        <!-- Filter & Search Toolbar -->
+        <div class="card" style="padding:1.25rem; margin-bottom:1.5rem;">
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:1rem; align-items:center;">
+            
+            <!-- 1. Select Employer -->
+            <div>
+              <label class="form-label" style="font-size:0.8125rem; margin-bottom:0.25rem;">Target Company</label>
+              <select id="companyQuestionSelect" class="form-select" style="font-size:0.875rem;">
+                <option value="">Loading premier companies...</option>
+              </select>
+            </div>
+
+            <!-- 2. Search Keywords -->
+            <div>
+              <label class="form-label" style="font-size:0.8125rem; margin-bottom:0.25rem;">Search Questions by Keyword</label>
+              <div style="position:relative;">
+                <input type="text" id="questionSearchInput" class="form-input" placeholder="e.g. SQL, LRU, Trie, STAR, Kafka..." style="font-size:0.875rem; padding-left:2.25rem;">
+                <i data-lucide="search" style="position:absolute; left:0.75rem; top:50%; transform:translateY(-50%); width:16px; height:16px; color:var(--color-text-subtle);"></i>
+              </div>
+            </div>
+
+            <!-- 3. Filter by Round -->
+            <div>
+              <label class="form-label" style="font-size:0.8125rem; margin-bottom:0.25rem;">Filter by Interview Round</label>
+              <select id="roundFilterSelect" class="form-select" style="font-size:0.875rem;">
+                <option value="all">All Rounds (Full Pipeline)</option>
+                <option value="1">Round 1: Online Assessment / Aptitude / MCQs</option>
+                <option value="2">Round 2: Coding & Machine Coding (LLD)</option>
+                <option value="3">Round 3: Advanced Technical & System Architecture</option>
+                <option value="4">Round 4: Managerial, HR & Leadership Values</option>
+              </select>
+            </div>
+
+          </div>
+
+          <!-- Question Format Chips -->
+          <div style="display:flex; gap:0.5rem; margin-top:1rem; align-items:center; flex-wrap:wrap; border-top:1px solid var(--color-border); padding-top:0.75rem;">
+            <span style="font-size:0.75rem; font-weight:700; color:var(--color-text-subtle); text-transform:uppercase;">Format:</span>
+            <button class="filter-chip active" data-format="all">All Questions</button>
+            <button class="filter-chip" data-format="mcq">Multiple Choice (MCQ)</button>
+            <button class="filter-chip" data-format="code">Coding & Algorithmic</button>
+            <button class="filter-chip" data-format="behavioral">System Design & HR</button>
+            <span id="questionCountBadge" style="margin-left:auto; font-size:0.8125rem; color:var(--color-text-muted); font-weight:600;">Showing Questions</span>
+          </div>
+        </div>
+
+        <!-- Questions List Container -->
+        <div id="companyQuestionsContainer" style="display:flex; flex-direction:column; gap:1.5rem; margin-bottom:2.5rem;">
+          <div style="text-align:center; padding:3rem; color:var(--color-text-subtle);">
+            Loading questions repository...
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Modal 1: Ask / Analyze Question with AI Tutor -->
+  <div id="askAiModal" class="modal-overlay">
+    <div class="modal-content">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid var(--color-border); padding-bottom:0.75rem;">
+        <div style="display:flex; align-items:center; gap:0.5rem;">
+          <div style="background:var(--color-primary-light); color:var(--color-primary); padding:0.35rem; border-radius:8px;">
+            <i data-lucide="sparkles" style="width:18px;height:18px;"></i>
+          </div>
+          <h3 style="margin:0; font-size:1.2rem;">Analyze Company Question with AI</h3>
+        </div>
+        <button id="closeAskAiModal" style="background:none; border:none; cursor:pointer; color:var(--color-text-subtle);">
+          <i data-lucide="x" style="width:20px;height:20px;"></i>
+        </button>
+      </div>
+
+      <form id="askAiForm" style="display:flex; flex-direction:column; gap:1rem;">
+        <div>
+          <label class="form-label">Target Employer</label>
+          <select id="askAiCompanySelect" class="form-select" required></select>
+        </div>
+
+        <div>
+          <label class="form-label">Interview Question / Problem Statement</label>
+          <textarea id="askAiQuestionInput" class="form-input" rows="4" placeholder="Paste or type any interview question asked by this company (e.g., 'How do you design an LRU cache?' or 'Why do you want to join our team?')" required></textarea>
+        </div>
+
+        <button type="submit" id="submitAskAiBtn" class="btn btn-primary btn-full">
+          <i data-lucide="cpu" style="width:16px;height:16px;"></i> Analyze Question & Generate Model Answer
+        </button>
+      </form>
+
+      <!-- AI Analysis Result Card -->
+      <div id="askAiResultBox" style="display:none; margin-top:1.25rem; border-top:1px solid var(--color-border); padding-top:1rem;">
+        <h4 id="aiResultTitle" style="font-size:1.05rem; margin-bottom:0.5rem; color:var(--color-primary);"></h4>
+        <div id="aiResultCategory" style="margin-bottom:0.75rem;"></div>
+        
+        <div style="background:#f8fafc; border:1px solid var(--color-border); border-radius:var(--radius-sm); padding:0.85rem; margin-bottom:0.75rem;">
+          <strong style="color:#0f172a; font-size:0.8125rem; text-transform:uppercase; letter-spacing:0.05em;">Recruiter Grading Rubric:</strong>
+          <p id="aiResultRubric" style="font-size:0.875rem; margin-top:0.25rem; color:#334155; line-height:1.5;"></p>
+        </div>
+
+        <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:var(--radius-sm); padding:0.85rem; margin-bottom:0.75rem;">
+          <strong style="color:#166534; font-size:0.8125rem; text-transform:uppercase; letter-spacing:0.05em;">Exemplary Model Answer:</strong>
+          <pre id="aiResultModelAns" style="font-size:0.875rem; margin-top:0.35rem; color:#14532d; white-space:pre-wrap; font-family:inherit; line-height:1.6;"></pre>
+        </div>
+
+        <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:var(--radius-sm); padding:0.85rem;">
+          <strong style="color:#92400e; font-size:0.8125rem; text-transform:uppercase; letter-spacing:0.05em;">Likely Follow-up Questions:</strong>
+          <ul id="aiResultFollowUps" style="margin:0.35rem 0 0 1.25rem; font-size:0.875rem; color:#78350f;"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 2: Add New Question to Repository -->
+  <div id="addQModal" class="modal-overlay">
+    <div class="modal-content">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid var(--color-border); padding-bottom:0.75rem;">
+        <div style="display:flex; align-items:center; gap:0.5rem;">
+          <div style="background:var(--color-success-light); color:var(--color-success); padding:0.35rem; border-radius:8px;">
+            <i data-lucide="plus-circle" style="width:18px;height:18px;"></i>
+          </div>
+          <h3 style="margin:0; font-size:1.2rem;">Contribute Company Interview Question</h3>
+        </div>
+        <button id="closeAddQModal" style="background:none; border:none; cursor:pointer; color:var(--color-text-subtle);">
+          <i data-lucide="x" style="width:20px;height:20px;"></i>
+        </button>
+      </div>
+
+      <form id="addQForm" style="display:flex; flex-direction:column; gap:1rem;">
+        <div style="display:grid; grid-template-columns: 2fr 1fr; gap:0.75rem;">
+          <div>
+            <label class="form-label">Target Employer</label>
+            <select id="addQCompanySelect" class="form-select" required></select>
+          </div>
+          <div>
+            <label class="form-label">Round</label>
+            <select id="addQRoundSelect" class="form-select" required>
+              <option value="1">Round 1 (Aptitude/OA)</option>
+              <option value="2">Round 2 (Coding/LLD)</option>
+              <option value="3">Round 3 (Tech/System)</option>
+              <option value="4">Round 4 (HR/Behavioral)</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="form-label">Question Text</label>
+          <textarea id="addQText" class="form-input" rows="3" placeholder="Enter the exact interview question or problem statement..." required></textarea>
+        </div>
+
+        <div>
+          <label class="form-label">Question Type</label>
+          <select id="addQTypeSelect" class="form-select">
+            <option value="mcq">Multiple Choice Question (4 Options)</option>
+            <option value="walkthrough">Coding Problem / Technical Walkthrough</option>
+          </select>
+        </div>
+
+        <!-- MCQ fields -->
+        <div id="addQMcqFields">
+          <label class="form-label">Options (Comma-separated or lines)</label>
+          <input type="text" id="addQOptionA" class="form-input" placeholder="Option A" style="margin-bottom:0.4rem;">
+          <input type="text" id="addQOptionB" class="form-input" placeholder="Option B" style="margin-bottom:0.4rem;">
+          <input type="text" id="addQOptionC" class="form-input" placeholder="Option C" style="margin-bottom:0.4rem;">
+          <input type="text" id="addQOptionD" class="form-input" placeholder="Option D" style="margin-bottom:0.4rem;">
+          <label class="form-label" style="margin-top:0.4rem;">Correct Option Text</label>
+          <input type="text" id="addQAnswer" class="form-input" placeholder="Exact correct option text">
+          <label class="form-label" style="margin-top:0.4rem;">Step-by-Step Explanation</label>
+          <textarea id="addQExplanation" class="form-input" rows="2" placeholder="Why is this option correct?"></textarea>
+        </div>
+
+        <!-- Technical Walkthrough fields -->
+        <div id="addQWalkthroughFields" style="display:none;">
+          <label class="form-label">Expected Evaluation Points (Comma-separated)</label>
+          <input type="text" id="addQExpected" class="form-input" placeholder="e.g. O(N) time complexity, Two Pointers, Handles duplicates">
+          <label class="form-label" style="margin-top:0.4rem;">Model Solution / Code Walkthrough</label>
+          <textarea id="addQModelAnswer" class="form-input" rows="3" placeholder="Explain the high-scoring solution approach or write clean code..."></textarea>
+        </div>
+
+        <button type="submit" id="submitAddQBtn" class="btn btn-primary btn-full">
+          <i data-lucide="check" style="width:16px;height:16px;"></i> Publish Question to Library
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    let allCompanies = [];
+    let currentCompany = null;
+    let activeFormatFilter = 'all';
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const user = await auth.requireAuth();
+      if (!user) return;
+
+      bindModals();
+      await loadCompanyDropdowns();
+      bindFilterEvents();
+    });
+
+    async function loadCompanyDropdowns() {
+      try {
+        const comps = await api.get('/interviews/companies');
+        if (!comps || comps.length === 0) return;
+        allCompanies = comps;
+
+        const mainSelect = document.getElementById('companyQuestionSelect');
+        const askAiSelect = document.getElementById('askAiCompanySelect');
+        const addQSelect = document.getElementById('addQCompanySelect');
+
+        let optionsHtml = '';
+        comps.forEach(c => {
+          optionsHtml += `<option value="${c.slug}">${escapeHtml(c.name)} (${escapeHtml(c.package)})</option>`;
+        });
+
+        mainSelect.innerHTML = optionsHtml;
+        askAiSelect.innerHTML = optionsHtml;
+        addQSelect.innerHTML = optionsHtml;
+
+        mainSelect.addEventListener('change', () => loadCompanyQuestions(mainSelect.value));
+        
+        // Initial load
+        loadCompanyQuestions(comps[0].slug);
+
+      } catch (err) {
+        console.error('Failed to load companies:', err);
+      }
+    }
+
+    function bindFilterEvents() {
+      const searchInput = document.getElementById('questionSearchInput');
+      if (searchInput) {
+        searchInput.addEventListener('input', () => renderFilteredQuestions());
+      }
+
+      const roundSelect = document.getElementById('roundFilterSelect');
+      if (roundSelect) {
+        roundSelect.addEventListener('change', () => renderFilteredQuestions());
+      }
+
+      document.querySelectorAll('.filter-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+          chip.classList.add('active');
+          activeFormatFilter = chip.dataset.format;
+          renderFilteredQuestions();
+        });
+      });
+    }
+
+    async function loadCompanyQuestions(slug) {
+      const container = document.getElementById('companyQuestionsContainer');
+      container.innerHTML = `<div style="text-align:center;padding:3rem;color:var(--color-text-subtle);">Loading questions...</div>`;
+      try {
+        const comp = await api.get(`/interviews/companies/${slug}`);
+        if (!comp || !comp.rounds) {
+          container.innerHTML = `<div style="text-align:center;padding:2rem;">No questions found for this employer.</div>`;
+          return;
+        }
+        currentCompany = comp;
+        renderFilteredQuestions();
+      } catch (err) {
+        console.error('Failed to load company questions:', err);
+        container.innerHTML = `<div style="text-align:center;padding:2rem;color:#ef4444;">Failed to load questions from backend.</div>`;
+      }
+    }
+
+    function renderFilteredQuestions() {
+      if (!currentCompany) return;
+      const container = document.getElementById('companyQuestionsContainer');
+      const searchQuery = (document.getElementById('questionSearchInput')?.value || '').toLowerCase().trim();
+      const selectedRound = document.getElementById('roundFilterSelect')?.value || 'all';
+
+      let totalRendered = 0;
+      let html = '';
+
+      currentCompany.rounds.forEach(r => {
+        if (selectedRound !== 'all' && String(r.round_number) !== selectedRound) {
+          return;
+        }
+
+        let qs = r.sample_questions || [];
+
+        // Filter by format
+        if (activeFormatFilter === 'mcq') {
+          qs = qs.filter(q => q.options && Array.isArray(q.options));
+        } else if (activeFormatFilter === 'code') {
+          qs = qs.filter(q => !q.options && (q.expected || q.model_answer));
+        } else if (activeFormatFilter === 'behavioral') {
+          qs = qs.filter(q => r.round_number >= 3);
+        }
+
+        // Filter by search query
+        if (searchQuery) {
+          qs = qs.filter(q => {
+            const qText = (q.question || '').toLowerCase();
+            const expText = (q.explanation || q.model_answer || '').toLowerCase();
+            const ansText = (q.answer || '').toLowerCase();
+            return qText.includes(searchQuery) || expText.includes(searchQuery) || ansText.includes(searchQuery);
+          });
+        }
+
+        totalRendered += qs.length;
+
+        let qListHtml = qs.map((q, idx) => {
+          let isMcq = q.options && Array.isArray(q.options);
+          let uniqueId = `q_${r.round_number}_${idx}`;
+          return `
+            <div style="padding:1.25rem; background:var(--color-bg-page); border:1px solid var(--color-border); border-radius:var(--radius-md); margin-bottom:1rem;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.6rem; flex-wrap:wrap; gap:0.5rem;">
+                <div style="display:flex; align-items:center; gap:0.5rem;">
+                  <span class="badge ${isMcq ? 'badge-primary' : 'badge-neutral'}">${isMcq ? 'Multiple Choice' : 'Code & Interview Walkthrough'}</span>
+                  <span style="font-size:0.75rem; font-weight:600; color:var(--color-text-subtle);">Question ${idx + 1}</span>
+                </div>
+                <div style="display:flex; gap:0.4rem;">
+                  <button class="btn btn-outline btn-sm ask-tutor-btn" data-question="${escapeHtml(q.question)}" data-company="${escapeHtml(currentCompany.name)}" data-slug="${currentCompany.slug}" data-round="${r.round_number}" style="font-size:0.75rem; padding:0.25rem 0.5rem;">
+                    <i data-lucide="sparkles" style="width:13px;height:13px;"></i> Ask AI Tutor
+                  </button>
+                  <button class="btn btn-secondary btn-sm toggle-sol-btn" data-target="${uniqueId}" style="font-size:0.75rem; padding:0.25rem 0.5rem;">
+                    <i data-lucide="eye" style="width:13px;height:13px;"></i> View Solution
+                  </button>
+                </div>
+              </div>
+
+              <div style="font-size:0.9375rem; font-weight:600; color:var(--color-text-main); margin-bottom:0.75rem; line-height:1.6; white-space:pre-wrap;">
+                ${escapeHtml(q.question)}
+              </div>
+
+              ${isMcq ? `
+                <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:0.5rem; margin-bottom:0.5rem;">
+                  ${q.options.map(opt => `<div style="padding:0.45rem 0.65rem; background:#ffffff; border:1px solid var(--color-border); border-radius:var(--radius-sm); font-size:0.8125rem;">${escapeHtml(opt)}</div>`).join('')}
+                </div>
+              ` : ''}
+
+              <!-- Expandable Solution Drawer -->
+              <div id="${uniqueId}" class="solution-drawer" style="background:#f8fafc; border:1px solid #cbd5e1;">
+                ${isMcq ? `
+                  <div style="color:#15803d; font-weight:700; margin-bottom:0.35rem;">
+                    ✓ Correct Option: ${escapeHtml(q.answer || '')}
+                  </div>
+                  <div style="color:#334155;">
+                    <strong>Detailed Explanation:</strong> ${escapeHtml(q.explanation || 'Refer to company conceptual guidelines.')}
+                  </div>
+                ` : `
+                  ${q.expected ? `
+                    <div style="margin-bottom:0.5rem; color:#1e40af;">
+                      <strong>Recruiter Key Points:</strong>
+                      <ul style="margin:0.25rem 0 0 1rem;">
+                        ${q.expected.map(e => `<li>${escapeHtml(e)}</li>`).join('')}
+                      </ul>
+                    </div>
+                  ` : ''}
+                  ${q.model_answer ? `
+                    <div style="color:#0f172a; margin-top:0.5rem; border-top:1px dashed #cbd5e1; padding-top:0.5rem;">
+                      <strong>Exemplary Model Solution:</strong>
+                      <p style="margin:0.25rem 0 0 0; white-space:pre-wrap; color:#334155;">${escapeHtml(q.model_answer)}</p>
+                    </div>
+                  ` : ''}
+                `}
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        html += `
+          <div class="card" style="padding:1.75rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid var(--color-border); padding-bottom:0.75rem; flex-wrap:wrap; gap:0.5rem;">
+              <div>
+                <span class="badge badge-primary">Round ${r.round_number}</span>
+                <h3 style="font-size:1.25rem; margin-top:0.25rem;">${escapeHtml(r.name)}</h3>
+              </div>
+              <div style="display:flex; align-items:center; gap:0.5rem;">
+                <span class="badge badge-warning">Cutoff: ${r.cutoff_percentage}%</span>
+                <a href="company-interviews.html" class="btn btn-primary btn-sm" style="font-size:0.75rem;">Practice in Simulator</a>
+              </div>
+            </div>
+            <div style="font-size:0.8125rem; color:var(--color-text-muted); margin-bottom:1rem;">
+              <strong>Recruiter Focus:</strong> ${escapeHtml(r.tips)}
+            </div>
+            ${qListHtml || '<div style="font-size:0.875rem; color:var(--color-text-subtle);">No questions match the current filter.</div>'}
+          </div>
+        `;
+      });
+
+      container.innerHTML = html || `<div style="text-align:center;padding:3rem;color:var(--color-text-subtle);">No questions match your search filters.</div>`;
+      
+      const countBadge = document.getElementById('questionCountBadge');
+      if (countBadge) countBadge.textContent = `${totalRendered} Questions Available`;
+
+      // Bind solution toggles
+      container.querySelectorAll('.toggle-sol-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const target = document.getElementById(btn.dataset.target);
+          if (target) {
+            const isVisible = target.style.display === 'block';
+            target.style.display = isVisible ? 'none' : 'block';
+            btn.innerHTML = isVisible 
+              ? `<i data-lucide="eye" style="width:13px;height:13px;"></i> View Solution`
+              : `<i data-lucide="eye-off" style="width:13px;height:13px;"></i> Hide Solution`;
+            if (window.lucide) lucide.createIcons();
+          }
+        });
+      });
+
+      // Bind Ask AI Tutor quick links
+      container.querySelectorAll('.ask-tutor-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const q = btn.dataset.question;
+          const slug = btn.dataset.slug;
+          const round = parseInt(btn.dataset.round, 10) || 1;
+          openAskAiModalWithQuestion(slug, round, q);
+        });
+      });
+
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function bindModals() {
+      // 1. Ask AI Modal
+      const askAiModal = document.getElementById('askAiModal');
+      const openAskAiBtn = document.getElementById('openAskAiBtn');
+      const closeAskAiBtn = document.getElementById('closeAskAiModal');
+      const askAiForm = document.getElementById('askAiForm');
+
+      if (openAskAiBtn) {
+        openAskAiBtn.addEventListener('click', () => {
+          document.getElementById('askAiResultBox').style.display = 'none';
+          askAiModal.style.display = 'flex';
+        });
+      }
+      if (closeAskAiBtn) {
+        closeAskAiBtn.addEventListener('click', () => {
+          askAiModal.style.display = 'none';
+        });
+      }
+
+      if (askAiForm) {
+        askAiForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const submitBtn = document.getElementById('submitAskAiBtn');
+          setButtonLoading(submitBtn, true, 'Analyzing...');
+
+          const slug = document.getElementById('askAiCompanySelect').value;
+          const question = document.getElementById('askAiQuestionInput').value.trim();
+
+          try {
+            const res = await api.post('/interviews/companies/ask-ai', {
+              company_slug: slug,
+              round_number: 1,
+              question: question
+            });
+
+            const resultBox = document.getElementById('askAiResultBox');
+            resultBox.style.display = 'block';
+
+            document.getElementById('aiResultTitle').textContent = `${res.company_name} — AI Interview Analysis`;
+            document.getElementById('aiResultCategory').innerHTML = `<span class="badge badge-primary">${escapeHtml(res.category)}</span> <span class="badge badge-neutral">${escapeHtml(res.core_concept)}</span>`;
+            document.getElementById('aiResultRubric').textContent = res.recruiter_grading_rubric;
+            document.getElementById('aiResultModelAns').textContent = res.model_answer;
+
+            const followUpsUl = document.getElementById('aiResultFollowUps');
+            followUpsUl.innerHTML = (res.follow_up_questions || []).map(f => `<li>${escapeHtml(f)}</li>`).join('');
+
+            showToast('Question analyzed successfully!', 'success');
+            resultBox.scrollIntoView({ behavior: 'smooth' });
+
+          } catch (err) {
+            showToast(err.message || 'Failed to analyze question.', 'error');
+          } finally {
+            setButtonLoading(submitBtn, false);
+          }
+        });
+      }
+
+      // 2. Add Question Modal
+      const addQModal = document.getElementById('addQModal');
+      const openAddQBtn = document.getElementById('openAddQBtn');
+      const closeAddQBtn = document.getElementById('closeAddQModal');
+      const addQForm = document.getElementById('addQForm');
+      const typeSelect = document.getElementById('addQTypeSelect');
+
+      if (openAddQBtn) {
+        openAddQBtn.addEventListener('click', () => {
+          addQModal.style.display = 'flex';
+        });
+      }
+      if (closeAddQBtn) {
+        closeAddQBtn.addEventListener('click', () => {
+          addQModal.style.display = 'none';
+        });
+      }
+
+      if (typeSelect) {
+        typeSelect.addEventListener('change', () => {
+          const isMcq = typeSelect.value === 'mcq';
+          document.getElementById('addQMcqFields').style.display = isMcq ? 'block' : 'none';
+          document.getElementById('addQWalkthroughFields').style.display = isMcq ? 'none' : 'block';
+        });
+      }
+
+      if (addQForm) {
+        addQForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const submitBtn = document.getElementById('submitAddQBtn');
+          setButtonLoading(submitBtn, true, 'Publishing...');
+
+          const slug = document.getElementById('addQCompanySelect').value;
+          const roundNum = parseInt(document.getElementById('addQRoundSelect').value, 10);
+          const qText = document.getElementById('addQText').value.trim();
+          const qType = document.getElementById('addQTypeSelect').value;
+
+          const payload = {
+            round_number: roundNum,
+            question: qText
+          };
+
+          if (qType === 'mcq') {
+            const optA = document.getElementById('addQOptionA').value.trim();
+            const optB = document.getElementById('addQOptionB').value.trim();
+            const optC = document.getElementById('addQOptionC').value.trim();
+            const optD = document.getElementById('addQOptionD').value.trim();
+            payload.options = [optA, optB, optC, optD].filter(Boolean);
+            payload.answer = document.getElementById('addQAnswer').value.trim() || optA;
+            payload.explanation = document.getElementById('addQExplanation').value.trim();
+          } else {
+            const expectedStr = document.getElementById('addQExpected').value.trim();
+            if (expectedStr) {
+              payload.expected = expectedStr.split(',').map(s => s.trim()).filter(Boolean);
+            }
+            payload.model_answer = document.getElementById('addQModelAnswer').value.trim();
+          }
+
+          try {
+            const res = await api.post(`/interviews/companies/${slug}/questions`, payload);
+            showToast(res.message || 'Question published!', 'success');
+            addQModal.style.display = 'none';
+            addQForm.reset();
+            
+            // Reload questions for this company
+            document.getElementById('companyQuestionSelect').value = slug;
+            await loadCompanyQuestions(slug);
+
+          } catch (err) {
+            showToast(err.message || 'Failed to add question.', 'error');
+          } finally {
+            setButtonLoading(submitBtn, false);
+          }
+        });
+      }
+
+      // Close modal on click outside
+      window.addEventListener('click', (e) => {
+        if (e.target === askAiModal) askAiModal.style.display = 'none';
+        if (e.target === addQModal) addQModal.style.display = 'none';
+      });
+    }
+
+    function openAskAiModalWithQuestion(slug, round, questionText) {
+      const askAiModal = document.getElementById('askAiModal');
+      const askAiCompanySelect = document.getElementById('askAiCompanySelect');
+      const askAiQuestionInput = document.getElementById('askAiQuestionInput');
+
+      if (askAiCompanySelect) askAiCompanySelect.value = slug;
+      if (askAiQuestionInput) askAiQuestionInput.value = questionText;
+
+      document.getElementById('askAiResultBox').style.display = 'none';
+      askAiModal.style.display = 'flex';
+      
+      // Auto trigger analysis
+      const submitBtn = document.getElementById('submitAskAiBtn');
+      if (submitBtn) submitBtn.click();
+    }
+  </script>
+</body>
+</html>

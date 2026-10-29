@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Achievements & Badges — InterviewAI</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+  <div class="app-layout">
+    <aside id="sidebar"></aside>
+
+    <div class="app-main">
+      <header id="topbar"></header>
+
+      <main class="page-body">
+        
+        <div style="margin-bottom: 2rem;">
+          <div style="display:inline-flex; align-items:center; gap:0.4rem; background:var(--color-primary-light); color:var(--color-primary); padding:0.25rem 0.75rem; border-radius:9999px; font-size:0.75rem; font-weight:700; margin-bottom:0.5rem;">
+            <i data-lucide="award" style="width:14px;height:14px;"></i> RECOGNITION & MILESTONES
+          </div>
+          <h1 style="font-size: 1.85rem; margin-bottom: 0.35rem;">Achievements & Skill Badges</h1>
+          <p style="color: var(--color-text-muted);">
+            Earn verified milestone badges by mastering aptitude topics, solving algorithms, and maintaining your preparation streak.
+          </p>
+        </div>
+
+        <div id="achievementsContainer" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:1.5rem; margin-bottom:2.5rem;">
+          <div style="text-align:center; padding:3rem; color:var(--color-text-subtle); grid-column:1/-1;">
+            Loading achievements...
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const user = await auth.requireAuth();
+      if (!user) return;
+      loadAchievements();
+    });
+
+    async function loadAchievements() {
+      const container = document.getElementById('achievementsContainer');
+      try {
+        const stats = await api.get('/dashboard/stats');
+        const solved = (stats && stats.coding_problems_solved) || 0;
+        const accuracy = (stats && stats.accuracy) || 0;
+        const streak = (stats && stats.streak_days) || 1;
+
+        const badges = [
+          {
+            title: "First Step Forward",
+            desc: "Created and configured student placement target role.",
+            icon: "check-circle",
+            unlocked: true,
+            tier: "Bronze"
+          },
+          {
+            title: "Aptitude Novice",
+            desc: "Answered first 5 placement questions with active locked evaluation.",
+            icon: "brain-circuit",
+            unlocked: accuracy > 0,
+            tier: "Bronze"
+          },
+          {
+            title: "Algorithmic Solver",
+            desc: "Submitted code solution passing test cases in the Coding Arena.",
+            icon: "code-2",
+            unlocked: solved >= 1,
+            tier: "Silver"
+          },
+          {
+            title: "Speech Pioneer",
+            desc: "Recorded and evaluated voice cadence in the Communication Lab.",
+            icon: "mic",
+            unlocked: true,
+            tier: "Silver"
+          },
+          {
+            title: "Streak Champion",
+            desc: "Maintained a continuous 7-day placement preparation streak.",
+            icon: "flame",
+            unlocked: streak >= 7,
+            tier: "Gold"
+          },
+          {
+            title: "Company Drive Finisher",
+            desc: "Cleared all recruitment stages for a Tier-1 tech employer.",
+            icon: "building-2",
+            unlocked: false,
+            tier: "Platinum"
+          }
+        ];
+
+        let html = '';
+        badges.forEach(b => {
+          html += `
+            <div class="card" style="padding:1.75rem; border-top:4px solid ${b.unlocked ? 'var(--color-primary)' : 'var(--color-border)'}; opacity:${b.unlocked ? '1' : '0.65'};">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                <div style="width:44px; height:44px; border-radius:var(--radius-md); background:${b.unlocked ? 'var(--color-primary-light)' : 'var(--color-bg-subtle)'}; color:${b.unlocked ? 'var(--color-primary)' : 'var(--color-text-subtle)'}; display:flex; align-items:center; justify-content:center;">
+                  <i data-lucide="${b.icon}" style="width:22px;height:22px;"></i>
+                </div>
+                <span class="badge ${b.unlocked ? 'badge-success' : 'badge-neutral'}">
+                  ${b.unlocked ? '✓ UNLOCKED' : 'LOCKED'}
+                </span>
+              </div>
+              <h3 style="font-size:1.15rem; margin-bottom:0.35rem; color:var(--color-text-main);">${escapeHtml(b.title)}</h3>
+              <p style="font-size:0.875rem; color:var(--color-text-muted); line-height:1.5;">${escapeHtml(b.desc)}</p>
+              <div style="font-size:0.75rem; color:var(--color-text-subtle); margin-top:1rem; font-weight:600; text-transform:uppercase;">Tier: ${escapeHtml(b.tier)}</div>
+            </div>
+          `;
+        });
+
+        container.innerHTML = html;
+        if (window.lucide) lucide.createIcons();
+      } catch (err) {
+        console.error('Failed to load achievements:', err);
+        container.innerHTML = `<div style="text-align:center;padding:2rem;color:#ef4444;">Failed to load achievements.</div>`;
+      }
+    }
+  </script>
+</body>
+</html>

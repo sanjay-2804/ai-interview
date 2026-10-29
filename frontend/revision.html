@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Revision Centre — InterviewAI</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+  <div class="app-layout">
+    <aside id="sidebar"></aside>
+
+    <div class="app-main">
+      <header id="topbar"></header>
+
+      <main class="page-body">
+        
+        <div style="margin-bottom: 2rem;">
+          <div style="display:inline-flex; align-items:center; gap:0.4rem; background:var(--color-primary-light); color:var(--color-primary); padding:0.25rem 0.75rem; border-radius:9999px; font-size:0.75rem; font-weight:700; margin-bottom:0.5rem;">
+            <i data-lucide="history" style="width:14px;height:14px;"></i> SPACED REVISION & EXPLANATIONS
+          </div>
+          <h1 style="font-size: 1.85rem; margin-bottom: 0.35rem;">Revision Centre</h1>
+          <p style="color: var(--color-text-muted);">
+            Review your previously attempted assessment questions, official solutions, step-by-step mathematical formulas, and common misconceptions.
+          </p>
+        </div>
+
+        <div id="revisionListContainer" style="display:flex; flex-direction:column; gap:1.5rem; margin-bottom:2.5rem;">
+          <div style="text-align:center; padding:3rem; color:var(--color-text-subtle);">
+            Loading past attempted questions...
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const user = await auth.requireAuth();
+      if (!user) return;
+      loadRevisionHistory();
+    });
+
+    async function loadRevisionHistory() {
+      const container = document.getElementById('revisionListContainer');
+      try {
+        const history = await api.get('/practice/revision');
+        if (!history || history.length === 0) {
+          container.innerHTML = `
+            <div class="card" style="text-align:center; padding:3rem;">
+              <i data-lucide="book-open" style="width:36px;height:36px;color:var(--color-text-subtle);margin-bottom:0.5rem;"></i>
+              <h3 style="font-size:1.15rem; margin-bottom:0.35rem;">No historical attempts found</h3>
+              <p style="color:var(--color-text-muted); font-size:0.875rem; margin-bottom:1.25rem;">Practice aptitude or coding questions to automatically save learning notes and explanations here.</p>
+              <a href="aptitude.html" class="btn btn-primary btn-sm">Start Aptitude Practice</a>
+            </div>
+          `;
+          if (window.lucide) lucide.createIcons();
+          return;
+        }
+
+        let html = '';
+        history.forEach(item => {
+          const isCorrect = item.is_correct;
+          html += `
+            <div class="card" style="padding:1.75rem; border-left:4px solid ${isCorrect ? 'var(--color-success)' : 'var(--color-danger)'};">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:0.75rem; flex-wrap:wrap; gap:0.5rem;">
+                <div>
+                  <span class="badge ${isCorrect ? 'badge-success' : 'badge-danger'}">
+                    ${isCorrect ? '✓ CORRECTLY ANSWERED' : '✗ INCORRECT ATTEMPT'}
+                  </span>
+                  <span class="badge badge-neutral" style="margin-left:0.35rem;">${escapeHtml(item.topic || 'General')}</span>
+                  <span class="badge badge-neutral" style="margin-left:0.35rem;">${escapeHtml(item.difficulty || 'Medium')}</span>
+                </div>
+                <div style="font-size:0.75rem; color:var(--color-text-subtle);">${escapeHtml(item.attempted_at)}</div>
+              </div>
+
+              <h4 style="font-size:1.05rem; line-height:1.6; margin-bottom:1rem; color:var(--color-text-main);">
+                ${escapeHtml(item.question_text)}
+              </h4>
+
+              <div style="display:flex; gap:1.5rem; margin-bottom:1rem; font-size:0.875rem;">
+                <div><strong>Your Submitted Option:</strong> <span style="font-weight:700; color:${isCorrect ? 'var(--color-success)' : 'var(--color-danger)'};">${escapeHtml(item.selected_option)}</span></div>
+                <div><strong>Official Correct Option:</strong> <span style="font-weight:700; color:var(--color-success);">${escapeHtml(item.correct_option)}</span></div>
+              </div>
+
+              <!-- Explanation Panel -->
+              <div style="padding:1rem 1.25rem; background:var(--color-bg-page); border:1px solid var(--color-border); border-radius:var(--radius-md); font-size:0.875rem; line-height:1.6; margin-bottom:0.75rem;">
+                <strong>Step-by-Step Mathematical Explanation:</strong><br>
+                ${escapeHtml(item.explanation || 'Refer to fundamental formulas.')}
+              </div>
+
+              <!-- Misconception Alert -->
+              ${!isCorrect ? `
+                <div style="font-size:0.8125rem; color:#92400e; background:#fffbeb; padding:0.65rem 1rem; border-radius:var(--radius-sm); border:1px solid #fde68a;">
+                  <strong>🎯 Likely Misconception:</strong> ${escapeHtml(item.misconception)}
+                </div>
+              ` : ''}
+            </div>
+          `;
+        });
+
+        container.innerHTML = html;
+        if (window.lucide) lucide.createIcons();
+      } catch (err) {
+        console.error('Failed to load revision centre:', err);
+        container.innerHTML = `<div style="text-align:center;padding:2rem;color:#ef4444;">Failed to load revision data.</div>`;
+      }
+    }
+  </script>
+</body>
+</html>

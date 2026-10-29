@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard — InterviewAI</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+  <div class="app-layout">
+    <aside id="sidebar"></aside>
+
+    <div class="app-main">
+      <header id="topbar"></header>
+
+      <main class="page-body">
+        
+        <div style="margin-bottom: 2rem;">
+          <div style="display:inline-flex; align-items:center; gap:0.4rem; background:#fef2f2; color:#dc2626; padding:0.25rem 0.6rem; border-radius:9999px; font-size:0.75rem; font-weight:700; margin-bottom:0.5rem;">
+            <i data-lucide="shield-alert" style="width:14px;height:14px;"></i> RESTRICTED ACCESS
+          </div>
+          <h1 style="font-size: 1.75rem; margin-bottom: 0.25rem;">Administrator Management Centre</h1>
+          <p style="color: var(--color-text-muted);">
+            Manage platform users, inspect question bank health, publish curriculum topics, and review learning activity logs.
+          </p>
+        </div>
+
+        <!-- 4 Platform Metric Cards -->
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem; margin-bottom: 2rem;">
+          <div class="metric-card">
+            <div class="metric-icon-box" style="background:#eff6ff; color:#2563eb;">
+              <i data-lucide="users" style="width:24px;height:24px;"></i>
+            </div>
+            <div>
+              <div class="metric-value" id="adminUsersCount">0</div>
+              <div class="metric-label">Registered Students</div>
+            </div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-icon-box" style="background:#ecfdf5; color:#059669;">
+              <i data-lucide="help-circle" style="width:24px;height:24px;"></i>
+            </div>
+            <div>
+              <div class="metric-value" id="adminQuestionsCount">548</div>
+              <div class="metric-label">Aptitude Questions</div>
+            </div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-icon-box" style="background:#fdf2f8; color:#db2777;">
+              <i data-lucide="code" style="width:24px;height:24px;"></i>
+            </div>
+            <div>
+              <div class="metric-value" id="adminCodingCount">313</div>
+              <div class="metric-label">Coding Challenges</div>
+            </div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-icon-box" style="background:#f5f3ff; color:#7c3aed;">
+              <i data-lucide="book" style="width:24px;height:24px;"></i>
+            </div>
+            <div>
+              <div class="metric-value" id="adminLessonsCount">0</div>
+              <div class="metric-label">Published Lessons</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Student Accounts Table -->
+        <div class="card" style="padding:1.5rem; margin-bottom:2rem;">
+          <div class="card-header">
+            <h3 class="card-title">Registered Student Directory</h3>
+          </div>
+          <div class="table-container" style="overflow-x:auto;">
+            <table style="width:100%; border-collapse:collapse; font-size:0.875rem; text-align:left;">
+              <thead>
+                <tr style="border-bottom:1.5px solid var(--color-border); color:var(--color-text-subtle);">
+                  <th style="padding:0.75rem;">ID</th>
+                  <th style="padding:0.75rem;">Student Name</th>
+                  <th style="padding:0.75rem;">Email Address</th>
+                  <th style="padding:0.75rem;">Role</th>
+                  <th style="padding:0.75rem;">Target Role</th>
+                  <th style="padding:0.75rem;">Status</th>
+                </tr>
+              </thead>
+              <tbody id="adminUsersTableBody">
+                <tr>
+                  <td colspan="6" style="padding:1.5rem; text-align:center; color:var(--color-text-subtle);">
+                    Loading registered student accounts...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Add Question Quick-Form -->
+        <div class="card" style="padding:1.75rem;">
+          <h3 style="font-size:1.15rem; margin-bottom:1rem; border-bottom:1px solid var(--color-border); padding-bottom:0.5rem;">
+            Publish Verified Aptitude Question
+          </h3>
+
+          <form id="createQuestionForm">
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1.25rem;">
+              <div class="form-group">
+                <label class="form-label" for="qCategory">Category</label>
+                <select id="qCategory" class="form-select">
+                  <option value="Quantitative Aptitude">Quantitative Aptitude</option>
+                  <option value="Logical Reasoning">Logical Reasoning</option>
+                  <option value="Verbal Ability">Verbal Ability</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="qDifficulty">Difficulty</label>
+                <select id="qDifficulty" class="form-select">
+                  <option value="Easy">Easy</option>
+                  <option value="Medium" selected>Medium</option>
+                  <option value="Hard">Hard</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="qText">Question Text</label>
+              <textarea id="qText" class="form-textarea" style="height:80px;" required placeholder="A train 120m long passes a pole in 6 seconds..."></textarea>
+            </div>
+
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem;">
+              <div class="form-group">
+                <label class="form-label" for="optA">Option A</label>
+                <input type="text" id="optA" class="form-input" required placeholder="60 km/h">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="optB">Option B</label>
+                <input type="text" id="optB" class="form-input" required placeholder="72 km/h">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="optC">Option C</label>
+                <input type="text" id="optC" class="form-input" required placeholder="80 km/h">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="optD">Option D</label>
+                <input type="text" id="optD" class="form-input" required placeholder="90 km/h">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="correctKey">Correct Option Key</label>
+              <select id="correctKey" class="form-select" style="max-width:200px;">
+                <option value="A">Option A</option>
+                <option value="B" selected>Option B</option>
+                <option value="C">Option C</option>
+                <option value="D">Option D</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="qExplanation">Step-by-Step Mathematical Explanation</label>
+              <textarea id="qExplanation" class="form-textarea" style="height:80px;" required placeholder="Speed = Distance / Time = 120m / 6s = 20 m/s. Convert to km/h by multiplying with 18/5: 20 * (18/5) = 72 km/h."></textarea>
+            </div>
+
+            <button type="submit" id="saveQuestionBtn" class="btn btn-primary">
+              <i data-lucide="plus-circle" style="width:16px;height:16px;"></i> Publish Question to Placement Bank
+            </button>
+          </form>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

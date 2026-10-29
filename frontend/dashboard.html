@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — InterviewAI</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Chart.js for dashboard charts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <div class="app-layout">
+    <!-- Sidebar -->
+    <aside id="sidebar"></aside>
+
+    <!-- Main Content -->
+    <div class="app-main">
+      <header id="topbar"></header>
+
+      <main class="page-body">
+        <!-- Hero Banner with Target Role -->
+        <div class="card" style="margin-bottom: 1.5rem; background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%); color: #ffffff; border:none; padding: 2rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1.25rem;">
+            <div>
+              <div style="display:inline-flex; align-items:center; gap:0.4rem; background:rgba(255,255,255,0.18); padding:0.25rem 0.75rem; border-radius:9999px; font-size:0.75rem; font-weight:600; margin-bottom:0.75rem;">
+                <i data-lucide="target" style="width:14px;height:14px;"></i> TARGET PLACEMENT GOAL
+              </div>
+              <h1 id="userGreeting" style="color:#ffffff; font-size:1.75rem; margin-bottom:0.35rem;">Welcome back!</h1>
+              <p style="color:#bfdbfe; font-size:0.9375rem; margin-bottom:0;">
+                Target Career: <strong id="careerRoleBadge" style="color:#ffffff;">Full-Stack Developer</strong> • Level: <span id="skillLevelBadge">Intermediate</span>
+              </p>
+            </div>
+
+            <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+              <a href="aptitude.html" class="btn" style="background-color:#ffffff; color:#1e40af; font-weight:600;">
+                <i data-lucide="play" style="width:16px;height:16px;"></i> Practice Aptitude
+              </a>
+              <a href="coding.html" class="btn" style="background:rgba(255,255,255,0.15); color:#ffffff; border:1px solid rgba(255,255,255,0.3);">
+                <i data-lucide="code" style="width:16px;height:16px;"></i> Solve Coding
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4 Metric Cards Grid -->
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1.25rem; margin-bottom: 1.5rem;">
+          <!-- 1. Learning Streak -->
+          <div class="metric-card">
+            <div class="metric-icon-box" style="background-color: #fef3c7; color: #d97706;">
+              <i data-lucide="flame" style="width:24px;height:24px;"></i>
+            </div>
+            <div>
+              <div class="metric-value" id="streakDays">0</div>
+              <div class="metric-label">Day Streak</div>
+            </div>
+          </div>
+
+          <!-- 2. Coding Solved -->
+          <div class="metric-card">
+            <div class="metric-icon-box" style="background-color: #eff6ff; color: #2563eb;">
+              <i data-lucide="code-2" style="width:24px;height:24px;"></i>
+            </div>
+            <div>
+              <div class="metric-value" id="codingSolved">0</div>
+              <div class="metric-label">Coding Solved</div>
+            </div>
+          </div>
+
+          <!-- 3. Aptitude Accuracy -->
+          <div class="metric-card">
+            <div class="metric-icon-box" style="background-color: #ecfdf5; color: #059669;">
+              <i data-lucide="check-check" style="width:24px;height:24px;"></i>
+            </div>
+            <div>
+              <div class="metric-value" id="aptitudeAccuracy">0%</div>
+              <div class="metric-label">Aptitude Accuracy</div>
+            </div>
+          </div>
+
+          <!-- 4. Lessons Completed -->
+          <div class="metric-card">
+            <div class="metric-icon-box" style="background-color: #f5f3ff; color: #7c3aed;">
+              <i data-lucide="book-check" style="width:24px;height:24px;"></i>
+            </div>
+            <div>
+              <div class="metric-value" id="lessonsCompleted">0</div>
+              <div class="metric-label">Lessons Finished</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Middle Row: Chart & Daily Challenge -->
+        <div style="display:grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;" class="dashboard-grid">
+          <!-- Weekly Learning Chart -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <i data-lucide="activity" style="color:var(--color-primary);width:20px;height:20px;"></i>
+                Weekly Activity & Assessment Output
+              </div>
+              <span class="badge badge-primary">Last 7 Days</span>
+            </div>
+            <div style="position:relative; height: 260px;">
+              <canvas id="weeklyActivityChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Daily Placement Challenge -->
+          <div class="card" style="display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+              <div class="card-header">
+                <div class="card-title">
+                  <i data-lucide="zap" style="color:#f59e0b;width:20px;height:20px;"></i>
+                  Daily Challenge
+                </div>
+                <span class="badge badge-warning">Today</span>
+              </div>
+              <h3 id="challengeTitle" style="font-size:1.05rem; margin-bottom:0.5rem;">Speed & Time Assessment</h3>
+              <p id="challengeDesc" style="font-size:0.875rem; color:var(--color-text-muted); margin-bottom:1rem;">
+                Attempt 5 timed quantitative aptitude questions to keep your practice streak active.
+              </p>
+            </div>
+            <div>
+              <a href="aptitude.html" id="startChallengeBtn" class="btn btn-primary btn-full">
+                <i data-lucide="play-circle" style="width:16px;height:16px;"></i> Start Challenge
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom Row: Recent Activity & Weak Topics -->
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;" class="dashboard-grid">
+          <!-- Recent Activity -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <i data-lucide="clock" style="color:var(--color-primary);width:20px;height:20px;"></i>
+                Recent Activity
+              </div>
+              <a href="progress.html" style="font-size:0.8125rem;">View All</a>
+            </div>
+            <div id="recentActivityList">
+              <div style="text-align:center; padding: 2rem 1rem; color:var(--color-text-subtle);">
+                <i data-lucide="calendar" style="width:36px;height:36px;margin:0 auto 0.5rem;opacity:0.4;"></i>
+                <p>No recent activity yet. Start your first practice session!</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Weak Topics & Next Steps -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <i data-lucide="alert-triangle" style="color:#ef4444;width:20px;height:20px;"></i>
+                Diagnostic Areas for Improvement
+              </div>
+              <span class="badge badge-neutral">Auto-diagnosed</span>
+            </div>
+            <div id="weakTopicsList">
+              <div style="text-align:center; padding: 2rem 1rem; color:var(--color-text-subtle);">
+                <i data-lucide="sparkles" style="width:36px;height:36px;margin:0 auto 0.5rem;opacity:0.4;"></i>
+                <p>Attempt aptitude and coding assessments to generate personalized diagnostic recommendations.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>

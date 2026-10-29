@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Career Roadmap — InterviewAI</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+  <div class="app-layout">
+    <aside id="sidebar"></aside>
+
+    <div class="app-main">
+      <header id="topbar"></header>
+
+      <main class="page-body">
+        
+        <!-- Header -->
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom: 2rem;">
+          <div>
+            <h1 style="font-size: 1.75rem; margin-bottom: 0.25rem;">Personalized Placement Roadmap</h1>
+            <p style="color: var(--color-text-muted);">
+              Ordered milestone pathway for <strong id="roadmapRoleName" style="color:var(--color-primary);">Full-Stack Developer</strong>.
+            </p>
+          </div>
+          <div style="display:flex; gap:0.75rem;">
+            <a href="career-setup.html" class="btn btn-secondary btn-sm">
+              <i data-lucide="sliders-horizontal" style="width:14px;height:14px;"></i> Adjust Goals
+            </a>
+          </div>
+        </div>
+
+        <!-- Progress Overview Card -->
+        <div class="card" style="margin-bottom: 2rem; padding: 1.5rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+            <span style="font-weight:600; font-size:0.9375rem;">Curriculum Milestone Completion</span>
+            <span id="roadmapProgressPct" style="font-weight:700; color:var(--color-primary);">0% Completed</span>
+          </div>
+          <div style="width:100%; height:8px; background:var(--color-bg-subtle); border-radius:9999px; overflow:hidden;">
+            <div id="roadmapProgressBar" style="width:0%; height:100%; background:var(--color-primary); transition:width 0.4s ease;"></div>
+          </div>
+        </div>
+
+        <!-- Stages List Container -->
+        <div id="stagesList" style="display:flex; flex-direction:column; gap:1.25rem;">
+          <div style="text-align:center; padding:3rem; color:var(--color-text-subtle);">
+            Generating your personalized career roadmap...
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/roadmap.js"></script>
+</body>
+</html>

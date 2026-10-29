@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Group Discussion Studio — InterviewAI</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+  <div class="app-layout">
+    <aside id="sidebar"></aside>
+
+    <div class="app-main">
+      <header id="topbar"></header>
+
+      <main class="page-body">
+        
+        <div style="margin-bottom: 2rem;">
+          <div style="display:inline-flex; align-items:center; gap:0.4rem; background:var(--color-primary-light); color:var(--color-primary); padding:0.25rem 0.75rem; border-radius:9999px; font-size:0.75rem; font-weight:700; margin-bottom:0.5rem;">
+            <i data-lucide="messages-square" style="width:14px;height:14px;"></i> CAMPUS SCREENING ROUND
+          </div>
+          <h1 style="font-size: 1.85rem; margin-bottom: 0.35rem;">Group Discussion & Debate Studio</h1>
+          <p style="color: var(--color-text-muted);">
+            Master argumentative frameworks, structured opening statements, balanced viewpoints, and leadership consensus techniques for placement GD rounds.
+          </p>
+        </div>
+
+        <div id="gdTopicsContainer" style="display:flex; flex-direction:column; gap:1.75rem; margin-bottom:2.5rem;">
+          <div style="text-align:center; padding:3rem; color:var(--color-text-subtle);">
+            Loading GD debate frameworks...
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const user = await auth.requireAuth();
+      if (!user) return;
+      loadGroupDiscussions();
+    });
+
+    async function loadGroupDiscussions() {
+      const container = document.getElementById('gdTopicsContainer');
+      try {
+        const topics = await api.get('/communication/group-discussions');
+        if (!topics || topics.length === 0) {
+          container.innerHTML = `<div style="text-align:center;padding:2rem;">No GD topics found.</div>`;
+          return;
+        }
+
+        let html = '';
+        topics.forEach(t => {
+          let forHtml = t.arguments_for.map(a => `<li style="margin-bottom:0.35rem;">✓ ${escapeHtml(a)}</li>`).join('');
+          let againstHtml = t.arguments_against.map(a => `<li style="margin-bottom:0.35rem;">✗ ${escapeHtml(a)}</li>`).join('');
+
+          html += `
+            <div class="card" style="padding:2rem;">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:0.75rem; flex-wrap:wrap; gap:0.5rem;">
+                <div>
+                  <span class="badge badge-accent">${escapeHtml(t.category)}</span>
+                  <h3 style="font-size:1.35rem; margin-top:0.35rem; color:var(--color-text-main);">${escapeHtml(t.title)}</h3>
+                </div>
+              </div>
+
+              <p style="font-size:0.875rem; color:var(--color-text-muted); line-height:1.6; margin-bottom:1.25rem;">
+                <strong>Context:</strong> ${escapeHtml(t.context)}
+              </p>
+
+              <!-- Opening Statement Blueprint -->
+              <div style="padding:1rem 1.25rem; background:#f0fdf4; border-left:4px solid var(--color-success); border-radius:var(--radius-sm); margin-bottom:1.5rem;">
+                <div style="font-size:0.8125rem; font-weight:700; color:#166534; text-transform:uppercase; margin-bottom:0.25rem;">
+                  🎯 Recommended Opening Statement Template
+                </div>
+                <div style="font-size:0.875rem; color:#14532d; font-style:italic; line-height:1.5;">
+                  "${escapeHtml(t.opening_statement)}"
+                </div>
+              </div>
+
+              <!-- Two Columns: For and Against -->
+              <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:1.25rem; margin-bottom:1.5rem;">
+                <div style="padding:1.25rem; background:#f8fafc; border-radius:var(--radius-md); border:1px solid var(--color-border);">
+                  <h4 style="font-size:0.9375rem; color:#166534; margin-bottom:0.75rem; display:flex; align-items:center; gap:0.35rem;">
+                    <i data-lucide="check-circle-2" style="width:16px;height:16px;"></i> Key Arguments (In Favor)
+                  </h4>
+                  <ul style="list-style:none; font-size:0.8125rem; color:var(--color-text-muted); line-height:1.6;">
+                    ${forHtml}
+                  </ul>
+                </div>
+
+                <div style="padding:1.25rem; background:#f8fafc; border-radius:var(--radius-md); border:1px solid var(--color-border);">
+                  <h4 style="font-size:0.9375rem; color:#991b1b; margin-bottom:0.75rem; display:flex; align-items:center; gap:0.35rem;">
+                    <i data-lucide="x-circle" style="width:16px;height:16px;"></i> Key Arguments (Against)
+                  </h4>
+                  <ul style="list-style:none; font-size:0.8125rem; color:var(--color-text-muted); line-height:1.6;">
+                    ${againstHtml}
+                  </ul>
+                </div>
+              </div>
+
+              <!-- Conclusion & Moderation Strategy -->
+              <div style="padding:1rem 1.25rem; background:var(--color-bg-page); border:1px solid var(--color-border); border-radius:var(--radius-sm); font-size:0.875rem; line-height:1.6; color:var(--color-text-main);">
+                <strong>Leadership Conclusion Technique:</strong> ${escapeHtml(t.conclusion_strategy)}
+              </div>
+            </div>
+          `;
+        });
+
+        container.innerHTML = html;
+        if (window.lucide) lucide.createIcons();
+      } catch (err) {
+        console.error('Failed to load GD topics:', err);
+        container.innerHTML = `<div style="text-align:center;padding:2rem;color:#ef4444;">Failed to load group discussions.</div>`;
+      }
+    }
+  </script>
+</body>
+</html>

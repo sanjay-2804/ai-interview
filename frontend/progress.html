@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Progress & Diagnostics — InterviewAI</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+  <div class="app-layout">
+    <aside id="sidebar"></aside>
+
+    <div class="app-main">
+      <header id="topbar"></header>
+
+      <main class="page-body">
+        
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom: 2rem;">
+          <div>
+            <h1 style="font-size: 1.75rem; margin-bottom: 0.25rem;">Student Diagnostic & Progress Summary</h1>
+            <p style="color: var(--color-text-muted);">
+              Comprehensive overview of your assessment scores, subtopic accuracy breakdowns, and preparation timeline.
+            </p>
+          </div>
+          <div>
+            <button id="exportDataBtn" class="btn btn-secondary btn-sm">
+              <i data-lucide="download" style="width:14px;height:14px;"></i> Export My Records (JSON)
+            </button>
+          </div>
+        </div>
+
+        <!-- 3 KPI Cards -->
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.25rem; margin-bottom: 2rem;">
+          <div class="card" style="padding:1.25rem;">
+            <div style="font-size:0.8125rem; color:var(--color-text-subtle);">Total Questions Attempted</div>
+            <div style="font-size:2rem; font-weight:800; color:var(--color-primary); margin-top:0.25rem;" id="totalAttemptsVal">0</div>
+          </div>
+          <div class="card" style="padding:1.25rem;">
+            <div style="font-size:0.8125rem; color:var(--color-text-subtle);">Cumulative Accuracy</div>
+            <div style="font-size:2rem; font-weight:800; color:var(--color-success); margin-top:0.25rem;" id="accuracyVal">0%</div>
+          </div>
+          <div class="card" style="padding:1.25rem;">
+            <div style="font-size:0.8125rem; color:var(--color-text-subtle);">Coding Challenges Solved</div>
+            <div style="font-size:2rem; font-weight:800; color:var(--color-accent); margin-top:0.25rem;" id="codingVal">0</div>
+          </div>
+        </div>
+
+        <!-- Topic Breakdown Table -->
+        <div class="card" style="padding:1.5rem; margin-bottom:2rem;">
+          <h3 style="font-size:1.15rem; margin-bottom:1rem;">Topic Accuracy & Diagnostic Breakdown</h3>
+          <div class="table-container" style="overflow-x:auto;">
+            <table style="width:100%; border-collapse:collapse; font-size:0.875rem; text-align:left;">
+              <thead>
+                <tr style="border-bottom:1.5px solid var(--color-border); color:var(--color-text-subtle);">
+                  <th style="padding:0.75rem;">Topic / Category</th>
+                  <th style="padding:0.75rem;">Attempts</th>
+                  <th style="padding:0.75rem;">Correct</th>
+                  <th style="padding:0.75rem;">Accuracy</th>
+                  <th style="padding:0.75rem;">Recommendation</th>
+                </tr>
+              </thead>
+              <tbody id="topicBreakdownBody">
+                <tr>
+                  <td colspan="5" style="padding:1.5rem; text-align:center; color:var(--color-text-subtle);">
+                    Loading diagnostics...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Account Safety / Deletion Control -->
+        <div class="card" style="padding:1.5rem; border-left:4px solid #ef4444; background:#fef2f2;">
+          <h4 style="color:#991b1b; font-size:1rem; margin-bottom:0.25rem;">Data Ownership & Privacy Safeguards</h4>
+          <p style="font-size:0.875rem; color:#991b1b; margin-bottom:1rem;">
+            In compliance with educational data privacy, you may permanently purge your practice records, answers, and account at any time.
+          </p>
+          <button id="deleteAccountBtn" class="btn btn-danger btn-sm">
+            <i data-lucide="trash-2" style="width:14px;height:14px;"></i> Request Account & Record Deletion
+          </button>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/progress.js"></script>
+</body>
+</html>

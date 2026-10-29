@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resume-Based Questions — InterviewAI</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+  <div class="app-layout">
+    <aside id="sidebar"></aside>
+
+    <div class="app-main">
+      <header id="topbar"></header>
+
+      <main class="page-body">
+        
+        <div style="margin-bottom: 2rem;">
+          <div style="display:inline-flex; align-items:center; gap:0.4rem; background:var(--color-primary-light); color:var(--color-primary); padding:0.25rem 0.75rem; border-radius:9999px; font-size:0.75rem; font-weight:700; margin-bottom:0.5rem;">
+            <i data-lucide="file-check" style="width:14px;height:14px;"></i> RESUME DEFENSE ENGINE
+          </div>
+          <h1 style="font-size: 1.85rem; margin-bottom: 0.35rem;">Resume-Based Interview Questions</h1>
+          <p style="color: var(--color-text-muted);">
+            Questions derived directly from your personal skills, projects, and academic background to help you defend your resume during placement interviews.
+          </p>
+        </div>
+
+        <div id="resumeQuestionsContainer" style="display:flex; flex-direction:column; gap:1.75rem; margin-bottom:2.5rem;">
+          <div style="text-align:center; padding:3rem; color:var(--color-text-subtle);">
+            Analyzing your resume and generating tailored defense questions...
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const user = await auth.requireAuth();
+      if (!user) return;
+      loadResumeQuestions();
+    });
+
+    async function loadResumeQuestions() {
+      const container = document.getElementById('resumeQuestionsContainer');
+      try {
+        const resume = await api.get('/resume');
+        const skills = (resume && resume.skills_json) ? resume.skills_json : ['Python', 'SQL', 'FastAPI', 'React', 'Data Structures'];
+        const projects = (resume && resume.projects_json && resume.projects_json.length > 0) 
+          ? resume.projects_json 
+          : [{ title: 'Full-Stack Placement Preparation Platform', tech: 'FastAPI, SQLite, Vanilla JavaScript' }];
+
+        let skillsQuestions = skills.slice(0, 5).map(s => `
+          <div style="padding:1rem; background:var(--color-bg-page); border:1px solid var(--color-border); border-radius:var(--radius-md); margin-bottom:0.75rem;">
+            <div style="font-weight:700; color:var(--color-primary); font-size:0.9375rem; margin-bottom:0.25rem;">
+              Skill Deep Dive: ${escapeHtml(s)}
+            </div>
+            <div style="font-size:0.875rem; color:var(--color-text-main); line-height:1.5;">
+              "You have listed <strong>${escapeHtml(s)}</strong> on your resume. How have you used it in production or academic projects, and what are its memory/execution trade-offs compared to alternatives?"
+            </div>
+          </div>
+        `).join('');
+
+        let projectQuestions = projects.map(p => `
+          <div class="card" style="padding:1.5rem; margin-bottom:1rem; border-left:4px solid var(--color-accent);">
+            <h4 style="font-size:1.15rem; color:var(--color-text-main); margin-bottom:0.35rem;">
+              Project: ${escapeHtml(p.title || 'Academic Capstone')}
+            </h4>
+            <div style="font-size:0.8125rem; color:var(--color-text-subtle); margin-bottom:1rem;">Technologies: ${escapeHtml(p.tech || 'Full-Stack Web')}</div>
+            
+            <div style="display:flex; flex-direction:column; gap:0.6rem; font-size:0.875rem;">
+              <div style="padding:0.75rem; background:var(--color-bg-page); border-radius:var(--radius-sm);">
+                <strong>1. Architecture & Data Flow:</strong> "Walk me through the system architecture of this project. What happens when a user clicks 'submit' in the frontend all the way to the database and back?"
+              </div>
+              <div style="padding:0.75rem; background:var(--color-bg-page); border-radius:var(--radius-sm);">
+                <strong>2. Individual Contribution & Conflict:</strong> "What was your specific individual contribution to this project, and what was the hardest bug you personally diagnosed and fixed?"
+              </div>
+              <div style="padding:0.75rem; background:var(--color-bg-page); border-radius:var(--radius-sm);">
+                <strong>3. Scalability & Failure Modes:</strong> "If user traffic grew 100x tomorrow, what would be the first bottleneck to crash, and how would you redesign the system with caching or asynchronous queues?"
+              </div>
+            </div>
+          </div>
+        `).join('');
+
+        container.innerHTML = `
+          <!-- Section 1: Project Defense -->
+          <div>
+            <h3 style="font-size:1.25rem; margin-bottom:1rem;">Project Defense Questions</h3>
+            ${projectQuestions}
+          </div>
+
+          <!-- Section 2: Skill Verifications -->
+          <div class="card" style="padding:1.75rem;">
+            <h3 style="font-size:1.25rem; margin-bottom:0.5rem;">Technical Skill Probes</h3>
+            <p style="color:var(--color-text-muted); font-size:0.875rem; margin-bottom:1.25rem;">
+              Interviewers use these questions to verify genuine practical competency in listed skills.
+            </p>
+            ${skillsQuestions}
+          </div>
+
+          <div style="text-align:center;">
+            <a href="resume.html" class="btn btn-secondary">
+              <i data-lucide="edit-3" style="width:14px;height:14px;"></i> Update Resume Details
+            </a>
+          </div>
+        `;
+
+        if (window.lucide) lucide.createIcons();
+      } catch (err) {
+        console.error('Failed to load resume questions:', err);
+        container.innerHTML = `<div style="text-align:center;padding:2rem;color:#ef4444;">Failed to generate resume questions.</div>`;
+      }
+    }
+  </script>
+</body>
+</html>

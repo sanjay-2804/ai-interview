@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coding Practice Centre — InterviewAI</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+  <div class="app-layout">
+    <aside id="sidebar"></aside>
+
+    <div class="app-main">
+      <header id="topbar"></header>
+
+      <main class="page-body">
+
+        <!-- Split View: Problem Browser & Editor -->
+        <div style="display:grid; grid-template-columns: 360px 1fr; gap: 1.5rem; height: calc(100vh - 120px);" class="coding-layout">
+          
+          <!-- Left Column: Problem List & Category Filter -->
+          <div class="card" style="display:flex; flex-direction:column; padding: 1.25rem; overflow:hidden;">
+            <div style="margin-bottom: 1rem;">
+              <h2 style="font-size:1.25rem; margin-bottom:0.25rem;">Coding Library</h2>
+              <p style="font-size:0.8125rem; color:var(--color-text-subtle);">310+ campus placement problems</p>
+            </div>
+
+            <!-- Filters -->
+            <div style="display:flex; gap:0.5rem; margin-bottom:0.75rem;">
+              <select id="categoryFilter" class="form-select" style="font-size:0.8125rem; padding:0.4rem 0.6rem;">
+                <option value="all">All Categories</option>
+                <option value="Fundamentals">Fundamentals & Math</option>
+                <option value="Arrays">Arrays & Hashing</option>
+                <option value="Strings">Strings & Two Pointers</option>
+                <option value="Searching">Searching & Sorting</option>
+                <option value="Linked Lists">Linked Lists</option>
+                <option value="Stacks & Queues">Stacks & Queues</option>
+                <option value="Trees">Trees & Graphs</option>
+                <option value="Dynamic Programming">Dynamic Programming</option>
+                <option value="Placement">Placement Challenges</option>
+              </select>
+
+              <select id="difficultyFilter" class="form-select" style="font-size:0.8125rem; padding:0.4rem 0.6rem; width:110px;">
+                <option value="all">All Diff</option>
+                <option value="Easy">Easy</option>
+                <option value="Medium">Medium</option>
+                <option value="Hard">Hard</option>
+              </select>
+            </div>
+
+            <input type="text" id="searchProblemInput" class="form-input" placeholder="Search problems..." style="font-size:0.8125rem; margin-bottom:0.75rem; padding:0.4rem 0.6rem;">
+
+            <!-- Problem List Container -->
+            <div id="problemList" style="flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:0.5rem; padding-right:0.25rem;">
+              <div style="text-align:center; padding:2rem 1rem; color:var(--color-text-subtle); font-size:0.875rem;">
+                Loading coding problems...
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Problem Detail & Code Editor -->
+          <div style="display:flex; flex-direction:column; gap:1.25rem; overflow-y:auto;">
+            
+            <!-- Problem Description Card -->
+            <div class="card" id="problemDetailCard">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1rem; flex-wrap:wrap; gap:0.5rem;">
+                <div>
+                  <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.25rem;">
+                    <h2 id="currentProblemTitle" style="font-size:1.4rem;">Select a Problem</h2>
+                    <span id="currentProblemDifficulty" class="badge badge-primary">Easy</span>
+                    <span id="currentProblemCategory" class="badge badge-neutral">Category</span>
+                  </div>
+                  <div style="font-size:0.8125rem; color:var(--color-text-subtle);">
+                    Time Complexity: <code id="timeComplexityVal" class="font-mono">O(N)</code> • Space: <code id="spaceComplexityVal" class="font-mono">O(1)</code>
+                  </div>
+                </div>
+
+                <div style="display:flex; gap:0.5rem;">
+                  <button id="viewHintsBtn" class="btn btn-secondary btn-sm">
+                    <i data-lucide="lightbulb" style="width:14px;height:14px;"></i> Hints
+                  </button>
+                </div>
+              </div>
+
+              <!-- Problem Statement -->
+              <div id="problemDescription" style="font-size:0.9375rem; color:var(--color-text-main); line-height:1.6; margin-bottom:1.25rem;">
+                Please select a problem from the left library list to review constraints, examples, and start coding.
+              </div>
+
+              <!-- Examples & Constraints -->
+              <div id="problemExamples" style="margin-bottom:1rem; font-size:0.875rem;"></div>
+              <div id="problemConstraints" style="font-size:0.8125rem; color:var(--color-text-muted);"></div>
+
+              <!-- Collapsible Hints Box -->
+              <div id="hintsContainer" style="display:none; margin-top:1rem; padding:0.75rem 1rem; background:#fffbeb; border:1px solid #fde68a; border-radius:var(--radius-md); font-size:0.875rem; color:#92400e;">
+                <strong>💡 Algorithmic Hint:</strong>
+                <div id="hintContent" style="margin-top:0.25rem;"></div>
+              </div>
+            </div>
+
+            <!-- Code Editor & Execution Runner -->
+            <div class="card" style="display:flex; flex-direction:column; padding:1.25rem;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+                <div style="display:flex; align-items:center; gap:0.75rem;">
+                  <label class="form-label" for="languageSelect" style="margin-bottom:0; font-size:0.8125rem;">Language:</label>
+                  <select id="languageSelect" class="form-select" style="font-size:0.8125rem; padding:0.35rem 0.65rem; width:130px;">
+                    <option value="python" selected>Python 3</option>
+                    <option value="javascript">JavaScript</option>
+                    <option value="java">Java</option>
+                    <option value="cpp">C++</option>
+                  </select>
+                </div>
+
+                <div style="display:flex; gap:0.5rem;">
+                  <button id="runCodeBtn" class="btn btn-secondary btn-sm">
+                    <i data-lucide="play" style="width:14px;height:14px;"></i> Run Tests
+                  </button>
+                  <button id="submitCodeBtn" class="btn btn-primary btn-sm">
+                    <i data-lucide="check-circle" style="width:14px;height:14px;"></i> Submit Code
+                  </button>
+                </div>
+              </div>
+
+              <!-- Editor Textarea -->
+              <div style="position:relative; margin-bottom:1rem;">
+                <textarea id="codeEditor" class="form-textarea font-mono" style="height:260px; font-size:0.875rem; line-height:1.5; background:#0f172a; color:#f8fafc; border-radius:var(--radius-md); resize:vertical; padding:1rem;" spellcheck="false"></textarea>
+              </div>
+
+              <!-- Terminal / Execution Output -->
+              <div style="background:#f1f5f9; border:1px solid var(--color-border); border-radius:var(--radius-md); padding:0.875rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+                  <span style="font-size:0.75rem; font-weight:700; color:var(--color-text-subtle); text-transform:uppercase;">
+                    Execution Console & Test Results
+                  </span>
+                  <span id="testStatusBadge" class="badge badge-neutral" style="font-size:0.75rem;">Ready</span>
+                </div>
+                <div id="consoleOutput" class="font-mono" style="font-size:0.8125rem; color:var(--color-text-main); white-space:pre-wrap; max-height:140px; overflow-y:auto;">
+Click "Run Tests" or "Submit Code" to evaluate your solution against test cases.
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/coding.js"></script>
+</body>
+</html>

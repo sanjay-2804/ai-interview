@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Account — InterviewAI</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body style="display:flex; flex-direction:column; justify-content:center; align-items:center; min-height:100vh; padding: 1.5rem; background: linear-gradient(135deg, #f8fafc 0%, #edf2f7 100%);">
+
+  <div style="width:100%; max-width: 480px;">
+    <!-- Logo -->
+    <div style="text-align:center; margin-bottom: 2rem;">
+      <a href="index.html" class="brand-logo" style="justify-content:center; margin-bottom: 0.5rem;">
+        <div class="brand-icon">AI</div>
+        <span>InterviewAI</span>
+      </a>
+      <p style="font-size: 0.9375rem; color: var(--color-text-muted);">Start preparing for campus placements today</p>
+    </div>
+
+    <!-- Registration Card -->
+    <div class="card" style="padding: 2.25rem; box-shadow: var(--shadow-lg);">
+      <div id="errorAlert" style="display:none; padding: 0.75rem 1rem; background-color: var(--color-danger-bg); border: 1px solid var(--color-danger-border); border-radius: var(--radius-md); color: var(--color-danger-text); font-size: 0.875rem; margin-bottom: 1.25rem;"></div>
+
+      <form id="registerForm">
+        <div class="form-group">
+          <label class="form-label" for="name">Full Name</label>
+          <input type="text" id="name" class="form-input" placeholder="Alex Morgan" required autocomplete="name">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="email">College Email Address</label>
+          <input type="email" id="email" class="form-input" placeholder="alex@college.edu" required autocomplete="email">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">Password (minimum 8 characters)</label>
+          <input type="password" id="password" class="form-input" placeholder="••••••••" required minlength="8" autocomplete="new-password">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="confirmPassword">Confirm Password</label>
+          <input type="password" id="confirmPassword" class="form-input" placeholder="••••••••" required minlength="8" autocomplete="new-password">
+        </div>
+
+        <div class="form-group">
+          <label class="form-check">
+            <input type="checkbox" id="termsConsent" required checked>
+            <span>I agree to the Terms of Service & Educational Privacy Policy</span>
+          </label>
+        </div>
+
+        <button type="submit" id="submitBtn" class="btn btn-primary btn-full btn-lg">
+          <i data-lucide="user-plus" style="width:18px;height:18px;"></i> Create Student Account
+        </button>
+      </form>
+
+      <div style="margin-top: 1.75rem; text-align:center; font-size: 0.875rem; color: var(--color-text-muted); border-top: 1px solid var(--color-border); padding-top: 1.25rem;">
+        Already have an account? <a href="login.html" style="font-weight:600;">Sign In</a>
+      </div>
+    </div>
+
+    <!-- Back to home -->
+    <div style="text-align:center; margin-top: 1.5rem;">
+      <a href="index.html" style="font-size: 0.875rem; color: var(--color-text-subtle); display:inline-flex; align-items:center; gap: 0.35rem;">
+        <i data-lucide="arrow-left" style="width:14px;height:14px;"></i> Return to Homepage
+      </a>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.lucide) lucide.createIcons();
+
+      const form = document.getElementById('registerForm');
+      const submitBtn = document.getElementById('submitBtn');
+      const errorAlert = document.getElementById('errorAlert');
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        errorAlert.style.display = 'none';
+
+        const name = document.getElementById('name').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+        const termsConsent = document.getElementById('termsConsent').checked;
+
+        if (password !== confirmPassword) {
+          errorAlert.textContent = 'Passwords do not match. Please verify.';
+          errorAlert.style.display = 'block';
+          return;
+        }
+
+        if (password.length < 8) {
+          errorAlert.textContent = 'Password must be at least 8 characters long.';
+          errorAlert.style.display = 'block';
+          return;
+        }
+
+        setButtonLoading(submitBtn, true, 'Creating Account...');
+
+        try {
+          await auth.register(name, email, password, confirmPassword, termsConsent);
+          showToast('Account created successfully!', 'success');
+          // All new students start at Career Setup Wizard
+          window.location.href = 'career-setup.html';
+        } catch (err) {
+          errorAlert.textContent = err.message || 'Registration failed. Email may already be in use.';
+          errorAlert.style.display = 'block';
+          setButtonLoading(submitBtn, false);
+        }
+      });
+    });
+  </script>
+</body>
+</html>

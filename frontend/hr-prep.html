@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HR Interview Preparation — InterviewAI</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+  <div class="app-layout">
+    <aside id="sidebar"></aside>
+
+    <div class="app-main">
+      <header id="topbar"></header>
+
+      <main class="page-body">
+        
+        <div style="margin-bottom: 2rem;">
+          <div style="display:inline-flex; align-items:center; gap:0.4rem; background:var(--color-primary-light); color:var(--color-primary); padding:0.25rem 0.75rem; border-radius:9999px; font-size:0.75rem; font-weight:700; margin-bottom:0.5rem;">
+            <i data-lucide="smile" style="width:14px;height:14px;"></i> BEHAVIORAL EXCELLENCE
+          </div>
+          <h1 style="font-size: 1.85rem; margin-bottom: 0.35rem;">HR & Managerial Interview Studio</h1>
+          <p style="color: var(--color-text-muted);">
+            Master competency-based behavioral interviews using the proven <strong>STAR Method (Situation, Task, Action, Result)</strong> with recruiter-vetted model answers.
+          </p>
+        </div>
+
+        <!-- STAR Framework Educational Banner -->
+        <div class="card" style="padding:1.75rem; margin-bottom:2rem; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color:#ffffff; border:none;">
+          <h3 style="color:#ffffff; font-size:1.25rem; margin-bottom:0.5rem;">The STAR Behavioral Framework</h3>
+          <p style="color:#94a3b8; font-size:0.875rem; margin-bottom:1.25rem;">Top recruiters at Google, Amazon, Microsoft, and TCS assess past performance as the strongest predictor of future success.</p>
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:1rem;">
+            <div style="background:rgba(255,255,255,0.06); padding:1rem; border-radius:var(--radius-md);">
+              <div style="font-weight:800; color:#38bdf8; font-size:1.1rem;">S - Situation</div>
+              <div style="font-size:0.8125rem; color:#cbd5e1; margin-top:0.25rem;">Set the scene. Provide specific context and challenge faced.</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.06); padding:1rem; border-radius:var(--radius-md);">
+              <div style="font-weight:800; color:#38bdf8; font-size:1.1rem;">T - Task</div>
+              <div style="font-size:0.8125rem; color:#cbd5e1; margin-top:0.25rem;">Identify your specific responsibility in that scenario.</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.06); padding:1rem; border-radius:var(--radius-md);">
+              <div style="font-weight:800; color:#38bdf8; font-size:1.1rem;">A - Action</div>
+              <div style="font-size:0.8125rem; color:#cbd5e1; margin-top:0.25rem;">Explain the concrete, systematic steps you personally took.</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.06); padding:1rem; border-radius:var(--radius-md);">
+              <div style="font-weight:800; color:#38bdf8; font-size:1.1rem;">R - Result</div>
+              <div style="font-size:0.8125rem; color:#cbd5e1; margin-top:0.25rem;">Share measurable outcomes, lessons learned, and impact.</div>
+            </div>
+          </div>
+        </div>
+
+        <div id="hrQuestionsContainer" style="display:flex; flex-direction:column; gap:1.75rem; margin-bottom:2.5rem;">
+          <div style="text-align:center; padding:3rem; color:var(--color-text-subtle);">
+            Loading HR behavioral scenarios...
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const user = await auth.requireAuth();
+      if (!user) return;
+      loadHrQuestions();
+    });
+
+    async function loadHrQuestions() {
+      const container = document.getElementById('hrQuestionsContainer');
+      try {
+        const questions = await api.get('/interviews/hr-questions');
+        if (!questions || questions.length === 0) {
+          container.innerHTML = `<div style="text-align:center;padding:2rem;">No HR questions found.</div>`;
+          return;
+        }
+
+        let html = '';
+        questions.forEach(q => {
+          html += `
+            <div class="card" style="padding:2rem;">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:0.75rem; flex-wrap:wrap; gap:0.5rem;">
+                <div>
+                  <span class="badge badge-primary">${escapeHtml(q.category)}</span>
+                  <span class="badge badge-neutral" style="margin-left:0.35rem;">Competency: ${escapeHtml(q.competency)}</span>
+                  <h3 style="font-size:1.35rem; margin-top:0.5rem; color:var(--color-text-main);">"${escapeHtml(q.question)}"</h3>
+                </div>
+              </div>
+
+              <!-- STAR Accordion -->
+              <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:1rem; margin-top:1.25rem; margin-bottom:1.5rem;">
+                <div style="padding:1rem; background:var(--color-bg-page); border-left:3px solid #3b82f6; border-radius:var(--radius-sm);">
+                  <strong style="font-size:0.8125rem; color:#1e40af; text-transform:uppercase;">Situation</strong>
+                  <div style="font-size:0.8125rem; color:var(--color-text-muted); margin-top:0.25rem; line-height:1.5;">${escapeHtml(q.star_breakdown.situation)}</div>
+                </div>
+                <div style="padding:1rem; background:var(--color-bg-page); border-left:3px solid #06b6d4; border-radius:var(--radius-sm);">
+                  <strong style="font-size:0.8125rem; color:#0e7490; text-transform:uppercase;">Task</strong>
+                  <div style="font-size:0.8125rem; color:var(--color-text-muted); margin-top:0.25rem; line-height:1.5;">${escapeHtml(q.star_breakdown.task)}</div>
+                </div>
+                <div style="padding:1rem; background:var(--color-bg-page); border-left:3px solid #10b981; border-radius:var(--radius-sm);">
+                  <strong style="font-size:0.8125rem; color:#047857; text-transform:uppercase;">Action</strong>
+                  <div style="font-size:0.8125rem; color:var(--color-text-muted); margin-top:0.25rem; line-height:1.5;">${escapeHtml(q.star_breakdown.action)}</div>
+                </div>
+                <div style="padding:1rem; background:var(--color-bg-page); border-left:3px solid #8b5cf6; border-radius:var(--radius-sm);">
+                  <strong style="font-size:0.8125rem; color:#5b21b6; text-transform:uppercase;">Result</strong>
+                  <div style="font-size:0.8125rem; color:var(--color-text-muted); margin-top:0.25rem; line-height:1.5;">${escapeHtml(q.star_breakdown.result)}</div>
+                </div>
+              </div>
+
+              <!-- Model Answer Box -->
+              <div style="padding:1.25rem; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:var(--radius-md); margin-bottom:1.25rem;">
+                <div style="font-size:0.8125rem; font-weight:700; color:#15803d; text-transform:uppercase; margin-bottom:0.35rem;">
+                  ⭐ Recommended Model Answer Walkthrough
+                </div>
+                <div style="font-size:0.875rem; color:#14532d; line-height:1.6;">
+                  "${escapeHtml(q.sample_answer)}"
+                </div>
+              </div>
+
+              <!-- Common Mistakes -->
+              <div style="font-size:0.8125rem; color:#991b1b; background:#fef2f2; padding:0.75rem 1rem; border-radius:var(--radius-sm); border:1px solid #fecaca;">
+                <strong>⚠️ Common Mistake to Avoid:</strong> ${escapeHtml(q.common_mistakes)}
+              </div>
+            </div>
+          `;
+        });
+
+        container.innerHTML = html;
+        if (window.lucide) lucide.createIcons();
+      } catch (err) {
+        console.error('Failed to load HR questions:', err);
+        container.innerHTML = `<div style="text-align:center;padding:2rem;color:#ef4444;">Failed to load HR interview studio.</div>`;
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Placement Challenges — InterviewAI</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+  <div class="app-layout">
+    <aside id="sidebar"></aside>
+
+    <div class="app-main">
+      <header id="topbar"></header>
+
+      <main class="page-body">
+        
+        <div style="margin-bottom: 2rem;">
+          <div style="display:inline-flex; align-items:center; gap:0.4rem; background:var(--color-primary-light); color:var(--color-primary); padding:0.25rem 0.75rem; border-radius:9999px; font-size:0.75rem; font-weight:700; margin-bottom:0.5rem;">
+            <i data-lucide="flame" style="width:14px;height:14px;"></i> DAILY STREAK ACCELERATOR
+          </div>
+          <h1 style="font-size: 1.85rem; margin-bottom: 0.35rem;">Daily Placement Challenge</h1>
+          <p style="color: var(--color-text-muted);" id="dailyDateText">
+            Refreshed daily for campus placement preparation. Solve 4 high-yield questions to maintain your preparation streak.
+          </p>
+        </div>
+
+        <div id="dailyChallengeContainer" style="display:flex; flex-direction:column; gap:2rem; margin-bottom:2.5rem;">
+          <div style="text-align:center; padding:3rem; color:var(--color-text-subtle);">
+            Loading today's placement challenge...
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    let challengeData = null;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const user = await auth.requireAuth();
+      if (!user) return;
+      loadDailyChallenge();
+    });
+
+    async function loadDailyChallenge() {
+      const container = document.getElementById('dailyChallengeContainer');
+      try {
+        challengeData = await api.get('/practice/daily-challenge');
+        if (!challengeData) {
+          container.innerHTML = `<div style="text-align:center;padding:2rem;">Could not load daily challenge.</div>`;
+          return;
+        }
+
+        if (challengeData.date) {
+          document.getElementById('dailyDateText').innerHTML = `Active Challenge Set for <strong>${escapeHtml(challengeData.date)}</strong>. Solve all 4 questions to advance your daily practice streak.`;
+        }
+
+        const apt = challengeData.aptitude_problem;
+        const code = challengeData.coding_problem;
+        const tech = challengeData.technical_problem;
+        const hr = challengeData.hr_question;
+
+        let html = `
+          <!-- Part 1: Daily Aptitude MCQ -->
+          <div class="card" style="padding:2rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid var(--color-border); padding-bottom:0.75rem;">
+              <div>
+                <span class="badge badge-primary">Part 1: Quantitative / Logical MCQ</span>
+                <h3 style="font-size:1.25rem; margin-top:0.25rem;">${escapeHtml(apt ? apt.topic_name : 'Aptitude')} Problem</h3>
+              </div>
+              <span class="badge badge-neutral">${escapeHtml(apt ? apt.difficulty : 'Medium')}</span>
+            </div>
+
+            <div style="font-size:1.05rem; font-weight:600; line-height:1.6; margin-bottom:1.25rem;">
+              ${escapeHtml(apt ? apt.question_text : 'A train crosses a pole in 15 seconds...')}
+            </div>
+
+            <div id="aptOptionsGrid" style="display:flex; flex-direction:column; gap:0.6rem; margin-bottom:1.5rem;">
+              ${apt && apt.options ? apt.options.map((opt, i) => `
+                <button type="button" class="option-btn apt-opt-btn" data-key="${opt.key}">
+                  <span class="option-key-badge">${escapeHtml(opt.key)}</span>
+                  <span>${escapeHtml(opt.text)}</span>
+                </button>
+              `).join('') : ''}
+            </div>
+
+            <button type="button" id="submitAptBtn" class="btn btn-primary">
+              <i data-lucide="check" style="width:16px;height:16px;"></i> Submit & Lock Answer
+            </button>
+
+            <div id="aptFeedbackBox" style="display:none; margin-top:1.25rem; padding:1.25rem; border-radius:var(--radius-md); border:1.5px solid var(--color-border);"></div>
+          </div>
+
+          <!-- Part 2: Daily Coding Challenge -->
+          <div class="card" style="padding:2rem; border-left:4px solid var(--color-accent);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid var(--color-border); padding-bottom:0.75rem;">
+              <div>
+                <span class="badge badge-accent">Part 2: Coding & Algorithms</span>
+                <h3 style="font-size:1.25rem; margin-top:0.25rem;">${escapeHtml(code ? code.title : 'Algorithmic Problem')}</h3>
+              </div>
+              <span class="badge badge-neutral">${escapeHtml(code ? code.difficulty : 'Medium')}</span>
+            </div>
+
+            <p style="font-size:0.9375rem; color:var(--color-text-main); line-height:1.6; margin-bottom:1.25rem;">
+              ${escapeHtml(code ? code.description : 'Implement the optimal solution.')}
+            </p>
+
+            <div style="padding:1rem; background:#0f172a; color:#38bdf8; font-family:monospace; font-size:0.875rem; border-radius:var(--radius-md); margin-bottom:1.25rem; white-space:pre-wrap;">${escapeHtml(code ? code.starter_code : '')}</div>
+
+            <a href="coding.html?id=${code ? code.id : 1}" class="btn btn-accent">
+              <i data-lucide="terminal" style="width:16px;height:16px;"></i> Solve in Coding Arena
+            </a>
+          </div>
+
+          <!-- Part 3: Daily Technical MCQ -->
+          <div class="card" style="padding:2rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid var(--color-border); padding-bottom:0.75rem;">
+              <div>
+                <span class="badge badge-success">Part 3: Core CS & Technical MCQ</span>
+                <h3 style="font-size:1.25rem; margin-top:0.25rem;">${escapeHtml(tech ? tech.topic_name : 'Technical Concept')}</h3>
+              </div>
+              <span class="badge badge-neutral">${escapeHtml(tech ? tech.difficulty : 'Medium')}</span>
+            </div>
+
+            <div style="font-size:1.05rem; font-weight:600; line-height:1.6; margin-bottom:1.25rem;">
+              ${escapeHtml(tech ? tech.question_text : 'Explain deadlock prevention.')}
+            </div>
+
+            <div id="techOptionsGrid" style="display:flex; flex-direction:column; gap:0.6rem; margin-bottom:1.5rem;">
+              ${tech && tech.options ? tech.options.map((opt, i) => `
+                <button type="button" class="option-btn tech-opt-btn" data-key="${opt.key}">
+                  <span class="option-key-badge">${escapeHtml(opt.key)}</span>
+                  <span>${escapeHtml(opt.text)}</span>
+                </button>
+              `).join('') : ''}
+            </div>
+
+            <button type="button" id="submitTechBtn" class="btn btn-primary">
+              <i data-lucide="check" style="width:16px;height:16px;"></i> Submit & Lock Answer
+            </button>
+
+            <div id="techFeedbackBox" style="display:none; margin-top:1.25rem; padding:1.25rem; border-radius:var(--radius-md); border:1.5px solid var(--color-border);"></div>
+          </div>
+
+          <!-- Part 4: Daily Recruiter Behavioral Prompt -->
+          <div class="card" style="padding:2rem; border-left:4px solid #ea580c;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid var(--color-border); padding-bottom:0.75rem;">
+              <div>
+                <span class="badge badge-warning" style="background:#ea580c; color:#ffffff;">Part 4: Recruiter Behavioral Prompt</span>
+                <h3 style="font-size:1.25rem; margin-top:0.25rem;">HR & Behavioral Scenario</h3>
+              </div>
+            </div>
+
+            <div style="font-size:1.05rem; font-weight:600; line-height:1.6; margin-bottom:1rem; color:var(--color-text-main);">
+              "${escapeHtml(hr || 'Describe a difficult technical bug you solved.')}"
+            </div>
+
+            <div class="form-group" style="margin-bottom:1.25rem;">
+              <textarea id="dailyHrResponse" class="form-textarea" style="height:120px;" placeholder="Structure using STAR: Situation, Task, Action, Result..."></textarea>
+            </div>
+
+            <button type="button" id="submitHrBtn" class="btn btn-primary">
+              <i data-lucide="send" style="width:16px;height:16px;"></i> Complete Daily Challenge
+            </button>
+
+            <div id="hrFeedbackBox" style="display:none; margin-top:1.25rem; padding:1.25rem; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:var(--radius-md); color:#15803d; font-size:0.875rem;">
+              ✓ <strong>Daily Streak Maintained!</strong> Your response has been logged. Continuous daily practice dramatically improves placement readiness.
+            </div>
+          </div>
+        `;
+
+        container.innerHTML = html;
+        if (window.lucide) lucide.createIcons();
+
+        // Bind Aptitude MCQ selection
+        let selectedApt = null;
+        document.querySelectorAll('.apt-opt-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            if (document.getElementById('submitAptBtn').disabled) return;
+            document.querySelectorAll('.apt-opt-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            selectedApt = btn.dataset.key;
+          });
+        });
+
+        document.getElementById('submitAptBtn').addEventListener('click', () => {
+          if (!selectedApt) {
+            showToast('Please choose an answer option before submitting.', 'info');
+            return;
+          }
+          const isCorrect = selectedApt.toUpperCase() === (apt.correct_option || '').toUpperCase();
+          const box = document.getElementById('aptFeedbackBox');
+          box.style.display = 'block';
+          box.style.backgroundColor = isCorrect ? '#f0fdf4' : '#fffbeb';
+          box.style.borderColor = isCorrect ? 'var(--color-success)' : '#fde68a';
+          box.innerHTML = `
+            <div style="font-weight:700; color:${isCorrect ? '#166534' : '#92400e'}; font-size:1rem; margin-bottom:0.5rem;">
+              ${isCorrect ? '✓ CORRECT ANSWER' : '✗ INCORRECT (Correct Option: ' + apt.correct_option + ')'}
+            </div>
+            <div style="font-size:0.875rem; color:var(--color-text-main); line-height:1.6;">
+              <strong>Step-by-Step Mathematical Explanation:</strong><br>${escapeHtml(apt.explanation || '')}
+            </div>
+          `;
+          document.getElementById('submitAptBtn').disabled = true;
+          document.getElementById('submitAptBtn').textContent = 'Answer Locked & Submitted';
+          showToast(isCorrect ? 'Correct answer!' : 'Reviewed solution.', isCorrect ? 'success' : 'info');
+        });
+
+        // Bind Tech MCQ selection
+        let selectedTech = null;
+        document.querySelectorAll('.tech-opt-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            if (document.getElementById('submitTechBtn').disabled) return;
+            document.querySelectorAll('.tech-opt-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            selectedTech = btn.dataset.key;
+          });
+        });
+
+        document.getElementById('submitTechBtn').addEventListener('click', () => {
+          if (!selectedTech) {
+            showToast('Please choose an answer option before submitting.', 'info');
+            return;
+          }
+          const isCorrect = selectedTech.toUpperCase() === (tech.correct_option || '').toUpperCase();
+          const box = document.getElementById('techFeedbackBox');
+          box.style.display = 'block';
+          box.style.backgroundColor = isCorrect ? '#f0fdf4' : '#fffbeb';
+          box.style.borderColor = isCorrect ? 'var(--color-success)' : '#fde68a';
+          box.innerHTML = `
+            <div style="font-weight:700; color:${isCorrect ? '#166534' : '#92400e'}; font-size:1rem; margin-bottom:0.5rem;">
+              ${isCorrect ? '✓ CORRECT ANSWER' : '✗ INCORRECT (Correct Option: ' + tech.correct_option + ')'}
+            </div>
+            <div style="font-size:0.875rem; color:var(--color-text-main); line-height:1.6;">
+              <strong>Pedagogical Explanation:</strong><br>${escapeHtml(tech.explanation || '')}
+            </div>
+          `;
+          document.getElementById('submitTechBtn').disabled = true;
+          document.getElementById('submitTechBtn').textContent = 'Answer Locked & Submitted';
+        });
+
+        // Bind HR submission
+        document.getElementById('submitHrBtn').addEventListener('click', () => {
+          const val = document.getElementById('dailyHrResponse').value.trim();
+          if (!val) {
+            showToast('Please enter your response before completing the challenge.', 'info');
+            return;
+          }
+          document.getElementById('hrFeedbackBox').style.display = 'block';
+          document.getElementById('submitHrBtn').disabled = true;
+          document.getElementById('submitHrBtn').textContent = 'Completed Today!';
+          showToast('Daily Challenge Completed! Streak Updated.', 'success');
+        });
+
+      } catch (err) {
+        console.error('Failed to load daily challenge:', err);
+        container.innerHTML = `<div style="text-align:center;padding:2rem;color:#ef4444;">Failed to load daily challenges.</div>`;
+      }
+    }
+  </script>
+</body>
+</html>

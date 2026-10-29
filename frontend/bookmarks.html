@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Saved Bookmarks — InterviewAI</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+  <div class="app-layout">
+    <aside id="sidebar"></aside>
+
+    <div class="app-main">
+      <header id="topbar"></header>
+
+      <main class="page-body">
+        
+        <div style="margin-bottom: 2rem;">
+          <div style="display:inline-flex; align-items:center; gap:0.4rem; background:var(--color-primary-light); color:var(--color-primary); padding:0.25rem 0.75rem; border-radius:9999px; font-size:0.75rem; font-weight:700; margin-bottom:0.5rem;">
+            <i data-lucide="bookmark" style="width:14px;height:14px;"></i> SAVED COLLECTION
+          </div>
+          <h1 style="font-size: 1.85rem; margin-bottom: 0.35rem;">Saved Bookmarks</h1>
+          <p style="color: var(--color-text-muted);">
+            Quickly revisit bookmarked aptitude questions, complex coding problems, and high-yield interview concepts.
+          </p>
+        </div>
+
+        <div id="bookmarksListContainer" style="display:flex; flex-direction:column; gap:1.25rem; margin-bottom:2.5rem;">
+          <div style="text-align:center; padding:3rem; color:var(--color-text-subtle);">
+            Loading saved bookmarks...
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const user = await auth.requireAuth();
+      if (!user) return;
+      loadBookmarks();
+    });
+
+    async function loadBookmarks() {
+      const container = document.getElementById('bookmarksListContainer');
+      try {
+        const bookmarks = await api.get('/bookmarks');
+        if (!bookmarks || bookmarks.length === 0) {
+          container.innerHTML = `
+            <div class="card" style="text-align:center; padding:3rem;">
+              <i data-lucide="bookmark-x" style="width:36px;height:36px;color:var(--color-text-subtle);margin-bottom:0.5rem;"></i>
+              <h3 style="font-size:1.15rem; margin-bottom:0.35rem;">No bookmarks saved yet</h3>
+              <p style="color:var(--color-text-muted); font-size:0.875rem; margin-bottom:1.25rem;">Click the bookmark icon while solving problems to store them for quick revision.</p>
+              <a href="aptitude.html" class="btn btn-primary btn-sm">Browse Aptitude Bank</a>
+            </div>
+          `;
+          if (window.lucide) lucide.createIcons();
+          return;
+        }
+
+        let html = '';
+        bookmarks.forEach(b => {
+          html += `
+            <div class="card" style="padding:1.5rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+              <div>
+                <span class="badge badge-primary">${escapeHtml(b.item_type || 'Question')}</span>
+                <h4 style="font-size:1.1rem; margin-top:0.35rem; color:var(--color-text-main);">${escapeHtml(b.title || 'Bookmarked Item')}</h4>
+                <div style="font-size:0.75rem; color:var(--color-text-subtle); margin-top:0.25rem;">Saved on: ${escapeHtml(b.created_at || 'Recently')}</div>
+              </div>
+
+              <div style="display:flex; gap:0.5rem;">
+                <button type="button" class="btn btn-secondary btn-sm remove-bookmark-btn" data-id="${b.id}">
+                  <i data-lucide="trash-2" style="width:14px;height:14px;"></i> Remove
+                </button>
+              </div>
+            </div>
+          `;
+        });
+
+        container.innerHTML = html;
+        if (window.lucide) lucide.createIcons();
+
+        container.querySelectorAll('.remove-bookmark-btn').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            const id = btn.dataset.id;
+            try {
+              await api.delete(`/bookmarks/${id}`);
+              showToast('Bookmark removed.', 'info');
+              loadBookmarks();
+            } catch (err) {
+              showToast(err.message || 'Failed to remove bookmark.', 'error');
+            }
+          });
+        });
+
+      } catch (err) {
+        console.error('Failed to load bookmarks:', err);
+        container.innerHTML = `<div style="text-align:center;padding:2rem;color:#ef4444;">Failed to load bookmarks.</div>`;
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notifications — InterviewAI</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+  <div class="app-layout">
+    <aside id="sidebar"></aside>
+
+    <div class="app-main">
+      <header id="topbar"></header>
+
+      <main class="page-body">
+        
+        <div style="margin-bottom: 2rem;">
+          <div style="display:inline-flex; align-items:center; gap:0.4rem; background:var(--color-primary-light); color:var(--color-primary); padding:0.25rem 0.75rem; border-radius:9999px; font-size:0.75rem; font-weight:700; margin-bottom:0.5rem;">
+            <i data-lucide="bell" style="width:14px;height:14px;"></i> PLACEMENT UPDATES
+          </div>
+          <h1 style="font-size: 1.85rem; margin-bottom: 0.35rem;">Notification Center</h1>
+          <p style="color: var(--color-text-muted);">
+            Campus recruitment drive announcements, daily practice streak reminders, and preparation milestones.
+          </p>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:1rem; margin-bottom:2.5rem;">
+          
+          <div class="card" style="padding:1.5rem; border-left:4px solid var(--color-primary); display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:1rem;">
+            <div>
+              <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.25rem;">
+                <span class="badge badge-primary">Campus Drive Alert</span>
+                <span style="font-size:0.75rem; color:var(--color-text-subtle);">Today</span>
+              </div>
+              <h3 style="font-size:1.15rem; margin-bottom:0.25rem;">TCS National Qualifier Test (NQT) Registration Live</h3>
+              <p style="font-size:0.875rem; color:var(--color-text-muted); line-height:1.5;">
+                Registration window is open for TCS Ninja, Digital, and Prime roles. Complete your Foundation Cognitive Assessment prep.
+              </p>
+            </div>
+            <a href="company-interviews.html?slug=tcs" class="btn btn-outline btn-sm">Practice TCS Round 1</a>
+          </div>
+
+          <div class="card" style="padding:1.5rem; border-left:4px solid var(--color-success); display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:1rem;">
+            <div>
+              <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.25rem;">
+                <span class="badge badge-success">Daily Practice</span>
+                <span style="font-size:0.75rem; color:var(--color-text-subtle);">1 hour ago</span>
+              </div>
+              <h3 style="font-size:1.15rem; margin-bottom:0.25rem;">Today's Placement Challenge Ready</h3>
+              <p style="font-size:0.875rem; color:var(--color-text-muted); line-height:1.5;">
+                Solve today's 4-part challenge: 1 Aptitude problem, 1 Algorithm problem, 1 Core CS question, and 1 HR prompt.
+              </p>
+            </div>
+            <a href="daily-challenges.html" class="btn btn-primary btn-sm">Solve Challenge</a>
+          </div>
+
+          <div class="card" style="padding:1.5rem; border-left:4px solid var(--color-accent); display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:1rem;">
+            <div>
+              <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.25rem;">
+                <span class="badge badge-accent">Curriculum Update</span>
+                <span style="font-size:0.75rem; color:var(--color-text-subtle);">Yesterday</span>
+              </div>
+              <h3 style="font-size:1.15rem; margin-bottom:0.25rem;">12 New Company Drives Added to Simulator</h3>
+              <p style="font-size:0.875rem; color:var(--color-text-muted); line-height:1.5;">
+                Recruitment round simulations for Microsoft, Google, Zoho, Oracle, Capgemini, HCLTech, and Deloitte are now live.
+              </p>
+            </div>
+            <a href="company-interviews.html" class="btn btn-secondary btn-sm">View All Companies</a>
+          </div>
+
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const user = await auth.requireAuth();
+      if (!user) return;
+      if (window.lucide) lucide.createIcons();
+    });
+  </script>
+</body>
+</html>

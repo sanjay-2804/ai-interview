@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In — InterviewAI</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body style="display:flex; flex-direction:column; justify-content:center; align-items:center; min-height:100vh; padding: 1.5rem; background: linear-gradient(135deg, #f8fafc 0%, #edf2f7 100%);">
+
+  <div style="width:100%; max-width: 440px;">
+    <!-- Logo -->
+    <div style="text-align:center; margin-bottom: 2rem;">
+      <a href="index.html" class="brand-logo" style="justify-content:center; margin-bottom: 0.5rem;">
+        <div class="brand-icon">AI</div>
+        <span>InterviewAI</span>
+      </a>
+      <p style="font-size: 0.9375rem; color: var(--color-text-muted);">Sign in to your placement preparation account</p>
+    </div>
+
+    <!-- Auth Card -->
+    <div class="card" style="padding: 2.25rem; box-shadow: var(--shadow-lg);">
+      <div id="errorAlert" style="display:none; padding: 0.75rem 1rem; background-color: var(--color-danger-bg); border: 1px solid var(--color-danger-border); border-radius: var(--radius-md); color: var(--color-danger-text); font-size: 0.875rem; margin-bottom: 1.25rem;"></div>
+
+      <form id="loginForm">
+        <div class="form-group">
+          <label class="form-label" for="email">College Email Address</label>
+          <input type="email" id="email" class="form-input" placeholder="student@college.edu" required autocomplete="email">
+        </div>
+
+        <div class="form-group">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 0.375rem;">
+            <label class="form-label" for="password" style="margin-bottom:0;">Password</label>
+            <button type="button" id="togglePasswordBtn" style="background:none; border:none; color:var(--color-primary); font-size: 0.8125rem; cursor:pointer; font-weight: 500;">Show</button>
+          </div>
+          <input type="password" id="password" class="form-input" placeholder="••••••••" required autocomplete="current-password">
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1.5rem;">
+          <label class="form-check">
+            <input type="checkbox" id="rememberMe">
+            <span>Remember this device</span>
+          </label>
+        </div>
+
+        <button type="submit" id="submitBtn" class="btn btn-primary btn-full btn-lg">
+          <i data-lucide="log-in" style="width:18px;height:18px;"></i> Sign In
+        </button>
+      </form>
+
+      <div style="margin-top: 1.75rem; text-align:center; font-size: 0.875rem; color: var(--color-text-muted); border-top: 1px solid var(--color-border); padding-top: 1.25rem;">
+        Don't have an account yet? <a href="register.html" style="font-weight:600;">Create an account</a>
+      </div>
+    </div>
+
+    <!-- Back to home -->
+    <div style="text-align:center; margin-top: 1.5rem;">
+      <a href="index.html" style="font-size: 0.875rem; color: var(--color-text-subtle); display:inline-flex; align-items:center; gap: 0.35rem;">
+        <i data-lucide="arrow-left" style="width:14px;height:14px;"></i> Return to Homepage
+      </a>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.lucide) lucide.createIcons();
+
+      // Check if expired param passed
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('expired')) {
+        const errorAlert = document.getElementById('errorAlert');
+        errorAlert.textContent = 'Your session has expired. Please sign in again.';
+        errorAlert.style.display = 'block';
+      }
+
+      // Password toggle
+      const toggleBtn = document.getElementById('togglePasswordBtn');
+      const passwordInput = document.getElementById('password');
+      toggleBtn.addEventListener('click', () => {
+        if (passwordInput.type === 'password') {
+          passwordInput.type = 'text';
+          toggleBtn.textContent = 'Hide';
+        } else {
+          passwordInput.type = 'password';
+          toggleBtn.textContent = 'Show';
+        }
+      });
+
+      // Handle submission
+      const form = document.getElementById('loginForm');
+      const submitBtn = document.getElementById('submitBtn');
+      const errorAlert = document.getElementById('errorAlert');
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        errorAlert.style.display = 'none';
+        setButtonLoading(submitBtn, true, 'Signing in...');
+
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+        const rememberMe = document.getElementById('rememberMe').checked;
+
+        try {
+          const res = await auth.login(email, password, rememberMe);
+          showToast('Sign in successful! Redirecting...', 'success');
+
+          // Check if user requires career setup
+          if (res.requires_onboarding || !res.user?.target_role) {
+            window.location.href = 'career-setup.html';
+          } else {
+            window.location.href = 'dashboard.html';
+          }
+        } catch (err) {
+          errorAlert.textContent = err.message || 'Invalid email or password. Please try again.';
+          errorAlert.style.display = 'block';
+          setButtonLoading(submitBtn, false);
+        }
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-surface-ground text-slateText-primary antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  /* Custom subtle scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #CBD5E1;
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #94A3B8;
+  }
+}
+
+@layer components {
+  /* Interactive Card Hover Utilities */
+  .card-hover {
+    @apply transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover hover:border-brand-200;
+  }
+
+  .card-interactive {
+    @apply transition-all duration-200 hover:-translate-y-1 hover:shadow-card-hover hover:border-brand-300 cursor-pointer;
+  }
+
+  /* Interactive Button Utility */
+  .btn-interactive {
+    @apply transition-all duration-150 active:scale-[0.98] cursor-pointer;
+  }
+}
+
+/* Print styling for ATS Resume */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #resume-printable-area, #resume-printable-area * {
+    visibility: visible;
+  }
+  #resume-printable-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0;
+    padding: 20px;
+    box-shadow: none !important;
+    border: none !important;
+  }
+}

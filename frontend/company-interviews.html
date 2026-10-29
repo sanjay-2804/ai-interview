@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Company Placement Drives — InterviewAI</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+  <div class="app-layout">
+    <aside id="sidebar"></aside>
+
+    <div class="app-main">
+      <header id="topbar"></header>
+
+      <main class="page-body">
+        
+        <!-- Header -->
+        <div style="margin-bottom: 2rem;">
+          <div style="display:inline-flex; align-items:center; gap:0.4rem; background:var(--color-primary-light); color:var(--color-primary); padding:0.25rem 0.75rem; border-radius:9999px; font-size:0.75rem; font-weight:700; margin-bottom:0.5rem;">
+            <i data-lucide="building-2" style="width:14px;height:14px;"></i> CAMPUS RECRUITMENT DRIVES
+          </div>
+          <h1 style="font-size: 1.85rem; margin-bottom: 0.35rem;">Real Company Placement Drive Simulator</h1>
+          <p style="color: var(--color-text-muted);">
+            Practice actual multi-round recruitment patterns modeled directly on hiring assessments of 18 top employers (TCS, Infosys, Amazon, Accenture, Wipro, Cognizant, Capgemini, HCLTech, Tech Mahindra, LTIMindtree, Zoho, Microsoft, Google, Oracle, IBM, Deloitte, Cisco, and Adobe).
+          </p>
+        </div>
+
+        <!-- View 1: Companies Grid Overview -->
+        <div id="companiesView">
+          <!-- Search & Filter Controls -->
+          <div class="card" style="padding:1.25rem; margin-bottom:1.5rem; display:flex; flex-wrap:wrap; gap:1rem; align-items:center; justify-content:space-between;">
+            <div style="flex:1; min-width:260px;">
+              <input type="text" id="companySearchInput" class="form-input" placeholder="Search by company name, role (e.g. Google, Zoho, SDE-1, Ninja)...">
+            </div>
+            <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+              <button type="button" class="btn btn-sm btn-primary company-filter-btn active" data-filter="all">All (18)</button>
+              <button type="button" class="btn btn-sm btn-secondary company-filter-btn" data-filter="product">Product Giants</button>
+              <button type="button" class="btn btn-sm btn-secondary company-filter-btn" data-filter="it">IT Services</button>
+              <button type="button" class="btn btn-sm btn-secondary company-filter-btn" data-filter="consulting">Consulting</button>
+            </div>
+          </div>
+
+          <div id="companyCardsGrid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+            <div style="text-align:center; padding:3rem; color:var(--color-text-subtle);">
+              Loading company recruitment drives...
+            </div>
+          </div>
+        </div>
+
+        <!-- View 2: Company Drive Detail & Multi-Round Hub -->
+        <div id="companyDetailView" style="display:none;">
+          <div style="margin-bottom:1.5rem;">
+            <button id="backToCompaniesBtn" class="btn btn-secondary btn-sm">
+              <i data-lucide="arrow-left" style="width:14px;height:14px;"></i> Back to All Companies
+            </button>
+          </div>
+
+          <!-- Company Banner Card -->
+          <div class="card" style="margin-bottom: 1.5rem; padding: 2rem; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color:#ffffff; border:none;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:1rem;">
+              <div>
+                <span id="detailBadge" class="badge badge-primary" style="background:#2563eb; color:#ffffff; margin-bottom:0.5rem;">Role</span>
+                <h2 id="detailCompanyName" style="font-size:1.85rem; color:#ffffff; margin-bottom:0.35rem;">Company Name</h2>
+                <div style="font-size:0.9375rem; color:#94a3b8; max-width:650px;" id="detailDescription">Description</div>
+              </div>
+              <div style="text-align:right;">
+                <div style="font-size:0.75rem; color:#94a3b8; text-transform:uppercase;">Typical CTC Bracket</div>
+                <div id="detailPackage" style="font-size:1.5rem; font-weight:800; color:#38bdf8;">₹3.6 - 9.0 LPA</div>
+                <div id="detailEligibility" style="font-size:0.75rem; color:#cbd5e1; margin-top:0.25rem;">Eligibility: 60%+ throughout</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Multi-Rounds Roadmap -->
+          <h3 style="font-size:1.25rem; margin-bottom:1rem;">Selection Rounds Pipeline</h3>
+          <div id="roundsListContainer" style="display:flex; flex-direction:column; gap:1rem; margin-bottom:2rem;"></div>
+        </div>
+
+        <!-- View 3: Active Company Round Simulator -->
+        <div id="activeRoundView" style="display:none; max-width:820px; margin:0 auto;">
+          <div style="margin-bottom:1.25rem;">
+            <button id="backToDetailBtn" class="btn btn-secondary btn-sm">
+              <i data-lucide="arrow-left" style="width:14px;height:14px;"></i> Return to Company Overview
+            </button>
+          </div>
+
+          <div class="card" style="padding:2.25rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; border-bottom:1px solid var(--color-border); padding-bottom:1rem;">
+              <div>
+                <span id="activeRoundCompanyBadge" class="badge badge-primary">TCS</span>
+                <h3 id="activeRoundTitle" style="font-size:1.35rem; margin-top:0.25rem;">Round 1: Technical Assessment</h3>
+              </div>
+              <span id="activeRoundCutoffBadge" class="badge badge-warning">Cutoff: 65%</span>
+            </div>
+
+            <!-- Pro Tip Box -->
+            <div style="padding:0.75rem 1rem; background:var(--color-bg-page); border:1px solid var(--color-border); border-radius:var(--radius-md); font-size:0.875rem; color:var(--color-text-muted); margin-bottom:1.5rem;">
+              <strong>🎯 Recruiter Focus & Preparation Tip:</strong>
+              <div id="activeRoundTip" style="margin-top:0.25rem;"></div>
+            </div>
+
+            <!-- Question Prompt -->
+            <div style="margin-bottom:1.5rem;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.6rem;">
+                <h4 style="font-size:1.05rem; margin:0; color:var(--color-text-main);">Simulation Question:</h4>
+                <div style="display:flex; align-items:center; gap:0.5rem;">
+                  <span id="activeRoundQuestionBadge" class="badge badge-neutral">Question 1 of 1</span>
+                  <button type="button" id="prevQuestionBtn" class="btn btn-secondary btn-sm" style="padding:0.25rem 0.6rem;" disabled>
+                    <i data-lucide="chevron-left" style="width:14px;height:14px;"></i>
+                  </button>
+                  <button type="button" id="nextQuestionBtn" class="btn btn-secondary btn-sm" style="padding:0.25rem 0.6rem;" disabled>
+                    <i data-lucide="chevron-right" style="width:14px;height:14px;"></i>
+                  </button>
+                </div>
+              </div>
+              <div id="activeRoundQuestion" style="font-size:1rem; color:var(--color-text-main); line-height:1.6; font-weight:600; padding:1.15rem; background:#f8fafc; border:1px solid var(--color-border); border-radius:var(--radius-md); white-space:pre-wrap;">
+                Loading question...
+              </div>
+            </div>
+
+            <!-- MCQ Options (if question has multiple choices) -->
+            <div id="activeRoundOptionsGrid" style="display:none; flex-direction:column; gap:0.6rem; margin-bottom:1.5rem;"></div>
+
+            <!-- Candidate Answer Box -->
+            <div id="activeRoundTextareaGroup" class="form-group" style="margin-bottom:1.5rem;">
+              <label class="form-label" for="activeRoundResponse">Your Answer / Code Walkthrough</label>
+              <textarea id="activeRoundResponse" class="form-textarea" style="height:150px; font-size:0.9375rem;" placeholder="Explain your solution, time complexity, or behavioral scenario thoroughly..."></textarea>
+            </div>
+
+            <button id="submitRoundResponseBtn" class="btn btn-primary btn-full btn-lg">
+              <i data-lucide="send" style="width:18px;height:18px;"></i> Submit for Company Hiring Evaluation
+            </button>
+
+            <!-- Evaluative Verdict Box -->
+            <div id="roundVerdictCard" style="display:none; margin-top:1.75rem; padding:1.5rem; border-radius:var(--radius-md); border:1.5px solid var(--color-border);">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                <div>
+                  <span id="verdictBadge" class="badge badge-success">ROUND CLEARED</span>
+                  <div style="font-size:0.8125rem; color:var(--color-text-subtle); margin-top:0.25rem;">Recruitment Assessment Evaluation</div>
+                </div>
+                <div style="font-size:1.75rem; font-weight:800; color:var(--color-primary);" id="verdictScore">85/100</div>
+              </div>
+
+              <div id="verdictFeedback" style="font-size:0.875rem; color:var(--color-text-main); line-height:1.6; margin-bottom:1rem;"></div>
+
+              <div id="verdictTips" style="font-size:0.8125rem; color:var(--color-text-muted); background:var(--color-bg-page); padding:0.75rem; border-radius:var(--radius-sm); border:1px solid var(--color-border);"></div>
+            </div>
+
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/company-interviews.js"></script>
+</body>
+</html>
+
