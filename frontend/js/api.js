@@ -3,9 +3,11 @@
  * Connects frontend to the FastAPI backend with credentials & authorization headers.
  */
 
-const API_BASE_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || !window.location.hostname)
-  ? 'http://127.0.0.1:8000/api/v1'
-  : '/api/v1';
+const API_BASE_URL = (window.location.port === '8000' || (!window.location.port && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1'))
+  ? '/api/v1'
+  : (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || !window.location.hostname)
+    ? 'http://127.0.0.1:8000/api/v1'
+    : '/api/v1';
 
 const api = {
   baseUrl: API_BASE_URL,

@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: interviewai_app
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+      - PROJECT_NAME=InterviewAI
+    restart: unless-stopped

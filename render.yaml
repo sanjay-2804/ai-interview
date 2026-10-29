@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: interviewai-platform
+    env: python
+    buildCommand: "pip install -r backend/requirements.txt"
+    startCommand: "cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    plan: free
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: PROJECT_NAME
+        value: "InterviewAI"
+      - key: VERSION
+        value: "2.0.0"
