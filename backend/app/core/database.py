@@ -1,13 +1,33 @@
+import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 from app.core.config import settings
 
+db_url = settings.DATABASE_URL
+
+# In Vercel serverless environments, the root filesystem is read-only.
+# Redirect SQLite database file to /tmp if using default local SQLite.
+if os.environ.get("VERCEL"):
+    if db_url.startswith("sqlite:///./") or db_url == "sqlite:///interviewai.db":
+        db_url = "sqlite:////tmp/interviewai.db"
+
+# Normalize PostgreSQL connection URLs to explicitly use psycopg2
+# This seamlessly supports postgres:// and postgresql:// provided by Supabase, Neon, Render, Railway, etc.
+if db_url.startswith("postgres://"):
+    db_url = db_url.replace("postgres://", "postgresql+psycopg2://", 1)
+elif db_url.startswith("postgresql://") and not db_url.startswith("postgresql+"):
+    db_url = db_url.replace("postgresql://", "postgresql+psycopg2://", 1)
+
 engine_args = {}
-if settings.DATABASE_URL.startswith("sqlite"):
+if db_url.startswith("sqlite"):
     engine_args["connect_args"] = {"check_same_thread": False}
+else:
+    # Serverless pooling optimizations for remote PostgreSQL
+    engine_args["pool_pre_ping"] = True
+    engine_args["pool_recycle"] = 300
 
 engine = create_engine(
-    settings.DATABASE_URL,
+    db_url,
     **engine_args
 )
 
@@ -20,4 +40,3 @@ def get_db():
         yield db
     finally:
         db.close()
-

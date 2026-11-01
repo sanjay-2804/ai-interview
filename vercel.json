@@ -1,15 +1,42 @@
 {
   "version": 2,
-  "public": true,
-  "cleanUrls": true,
-  "routes": [
+  "functions": {
+    "api/index.py": {
+      "maxDuration": 15
+    }
+  },
+  "rewrites": [
     {
-      "src": "/api/(.*)",
-      "dest": "http://127.0.0.1:8000/api/$1"
+      "source": "/api/(.*)",
+      "destination": "/api/index.py"
     },
     {
-      "src": "/(.*)",
-      "dest": "/frontend/$1"
+      "source": "/health",
+      "destination": "/api/index.py"
+    },
+    {
+      "source": "/css/(.*)",
+      "destination": "/frontend/css/$1"
+    },
+    {
+      "source": "/js/(.*)",
+      "destination": "/frontend/js/$1"
+    },
+    {
+      "source": "/assets/(.*)",
+      "destination": "/frontend/assets/$1"
+    },
+    {
+      "source": "/",
+      "destination": "/frontend/index.html"
+    },
+    {
+      "source": "/(.*\\.html)",
+      "destination": "/frontend/$1"
+    },
+    {
+      "source": "/((?!api/).*)",
+      "destination": "/frontend/$1"
     }
   ]
 }

@@ -1,4 +1,6 @@
+import os
 from pydantic_settings import BaseSettings
+from pydantic import model_validator
 from typing import List, Optional
 
 class Settings(BaseSettings):
@@ -12,10 +14,10 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # 7 days
     
-    # Cookie security
+    # Cookie security (HTTPS on Vercel)
     SESSION_COOKIE_NAME: str = "interviewai_session"
     CSRF_COOKIE_NAME: str = "interviewai_csrf"
-    COOKIE_SECURE: bool = False  # Set to True in HTTPS production
+    COOKIE_SECURE: bool = bool(os.environ.get("VERCEL"))
     COOKIE_SAMESITE: str = "lax"
     
     # URLs
@@ -26,9 +28,10 @@ class Settings(BaseSettings):
     DATABASE_URL: str = "sqlite:///./interviewai.db"
 
     # AI Configuration
-    AI_PROVIDER: Optional[str] = None
+    AI_PROVIDER: Optional[str] = "gemini"
     AI_MODEL: Optional[str] = "gemini-1.5-flash"
     AI_API_KEY: Optional[str] = None
+    GEMINI_API_KEY: Optional[str] = None
 
     # Email Service (Optional)
     EMAIL_PROVIDER: Optional[str] = None
@@ -41,6 +44,13 @@ class Settings(BaseSettings):
         "http://localhost:3000",
         "http://127.0.0.1:3000",
     ]
+
+    @model_validator(mode="after")
+    def resolve_keys(self):
+        # Support GEMINI_API_KEY as alias for AI_API_KEY
+        if not self.AI_API_KEY and self.GEMINI_API_KEY:
+            self.AI_API_KEY = self.GEMINI_API_KEY
+        return self
 
     class Config:
         env_file = ".env"

@@ -3,11 +3,17 @@
  * Connects frontend to the FastAPI backend with credentials & authorization headers.
  */
 
-const API_BASE_URL = (window.location.port === '8000' || (!window.location.port && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1'))
-  ? '/api/v1'
-  : (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || !window.location.hostname)
-    ? 'http://127.0.0.1:8000/api/v1'
-    : '/api/v1';
+// Automatically use relative path '/api/v1' for production/Vercel or same-origin backend,
+// fallback to 'http://127.0.0.1:8000/api/v1' only if opened via separate local dev server (e.g. Vite port 5173 / LiveServer port 5500)
+const API_BASE_URL = (() => {
+  if (typeof window === 'undefined') return '/api/v1';
+  const isLocalDevPort = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') &&
+    (window.location.port && window.location.port !== '8000' && window.location.port !== '');
+  if (isLocalDevPort) {
+    return 'http://127.0.0.1:8000/api/v1';
+  }
+  return '/api/v1';
+})();
 
 const api = {
   baseUrl: API_BASE_URL,

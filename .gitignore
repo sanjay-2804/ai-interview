@@ -33,6 +33,11 @@ test_interviewai.db
 .env.*.local
 *.env
 
+# Local utilities & temporary clones
+cloudflared.exe
+ai-interview/
+.vercel/
+
 # IDE & OS
 .vscode/
 .idea/
